@@ -15,13 +15,14 @@ class BottomTools extends StatelessWidget {
 
   /// editor background color
   final Color? editorBackgroundColor;
-  const BottomTools(
-      {Key? key,
-      required this.contentKey,
-      required this.onDone,
-      this.onDoneButtonStyle,
-      this.editorBackgroundColor})
-      : super(key: key);
+
+  const BottomTools({
+    Key? key,
+    required this.contentKey,
+    required this.onDone,
+    this.onDoneButtonStyle,
+    this.editorBackgroundColor,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -50,16 +51,20 @@ class BottomTools extends StatelessWidget {
                                     /// scroll to gridView page
                                     if (controlNotifier.mediaPath.isEmpty) {
                                       scrollNotifier.pageController
-                                          .animateToPage(1,
-                                              duration: const Duration(
-                                                  milliseconds: 300),
-                                              curve: Curves.ease);
+                                          .animateToPage(
+                                        1,
+                                        duration: const Duration(
+                                          milliseconds: 300,
+                                        ),
+                                        curve: Curves.ease,
+                                      );
                                     }
                                   },
                                   child: const CoverThumbnail(
                                     thumbnailQuality: 150,
                                   ),
-                                ))
+                                ),
+                              )
 
                             /// return clear [imagePath] provider
                             : GestureDetector(
@@ -91,8 +96,9 @@ class BottomTools extends StatelessWidget {
                   Expanded(
                     child: Center(
                       child: Container(
-                          alignment: Alignment.bottomCenter,
-                          child: controlNotifier.middleBottomWidget),
+                        alignment: Alignment.bottomCenter,
+                        child: controlNotifier.middleBottomWidget,
+                      ),
                     ),
                   )
                 else
@@ -110,10 +116,11 @@ class BottomTools extends StatelessWidget {
                           const Text(
                             'Stories Creator',
                             style: TextStyle(
-                                color: Colors.white38,
-                                letterSpacing: 1.5,
-                                fontSize: 9.2,
-                                fontWeight: FontWeight.bold),
+                              color: Colors.white38,
+                              letterSpacing: 1.5,
+                              fontSize: 9.2,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ],
                       ),
@@ -127,48 +134,58 @@ class BottomTools extends StatelessWidget {
                     child: Transform.scale(
                       scale: 0.9,
                       child: AnimatedOnTapButton(
-                          onTap: () async {
-                            String pngUri;
-                            await takePicture(
-                                    contentKey: contentKey,
-                                    context: context,
-                                    saveToGallery: false)
-                                .then((bytes) {
-                              if (bytes != null) {
-                                pngUri = bytes;
-                                onDone(pngUri);
-                              } else {}
-                            });
-                          },
-                          child: onDoneButtonStyle ??
-                              Container(
-                                padding: const EdgeInsets.only(
-                                    left: 12, right: 5, top: 4, bottom: 4),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(15),
-                                    border: Border.all(
-                                        color: Colors.white, width: 1.5)),
-                                child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: const [
-                                      Text(
-                                        'Share',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            letterSpacing: 1.5,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w400),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.only(left: 5),
-                                        child: Icon(
-                                          Icons.arrow_forward_ios,
-                                          color: Colors.white,
-                                          size: 15,
-                                        ),
-                                      ),
-                                    ]),
-                              )),
+                        onTap: () async {
+                          String pngUri;
+                          await takePicture(
+                            contentKey: contentKey,
+                            context: context,
+                            saveToGallery: false,
+                          ).then((bytes) {
+                            if (bytes != null) {
+                              pngUri = bytes as String;
+                              onDone(pngUri);
+                            } else {}
+                          });
+                        },
+                        child: onDoneButtonStyle ??
+                            Container(
+                              padding: const EdgeInsets.only(
+                                left: 12,
+                                right: 5,
+                                top: 4,
+                                bottom: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: const [
+                                  Text(
+                                    'Share',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      letterSpacing: 1.5,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 5),
+                                    child: Icon(
+                                      Icons.arrow_forward_ios,
+                                      color: Colors.white,
+                                      size: 15,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                      ),
                     ),
                   ),
                 ),
@@ -180,13 +197,14 @@ class BottomTools extends StatelessWidget {
     );
   }
 
-  Widget _preViewContainer({child}) {
+  Widget _preViewContainer({required Widget child}) {
     return Container(
       height: 45,
       width: 45,
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(width: 1.4, color: Colors.white)),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(width: 1.4, color: Colors.white),
+      ),
       child: child,
     );
   }

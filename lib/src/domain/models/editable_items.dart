@@ -7,7 +7,7 @@ class EditableItem {
   bool deletePosition = false;
 
   /// item position
-  Offset position = const Offset(0.0, 0.0);
+  Offset position = Offset.zero;
   double scale = 1;
   double rotation = 0;
   ItemType type = ItemType.text;

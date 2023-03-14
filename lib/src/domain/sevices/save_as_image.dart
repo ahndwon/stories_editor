@@ -6,14 +6,15 @@ import 'package:flutter/rendering.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
 
-Future takePicture(
-    {required contentKey,
-    required BuildContext context,
-    required saveToGallery}) async {
+Future takePicture({
+  required contentKey,
+  required BuildContext context,
+  required bool saveToGallery,
+}) async {
   try {
     /// converter widget to image
     RenderRepaintBoundary boundary =
-        contentKey.currentContext.findRenderObject();
+        contentKey.currentContext.findRenderObject() as RenderRepaintBoundary;
 
     ui.Image image = await boundary.toImage(pixelRatio: 3.0);
 

@@ -5,7 +5,7 @@ class TextEditingNotifier extends ChangeNotifier {
   String _text = '';
   List<String> _textList = [];
   int _textColor = 0;
-  double _textSize = 25.0;
+  double _textSize = 25;
   int _fontFamilyIndex = 0;
   int _fontAnimationIndex = 0;
   TextAlign _textAlign = TextAlign.center;
@@ -46,18 +46,31 @@ class TextEditingNotifier extends ChangeNotifier {
   ];
 
   String get text => _text;
+
   int get textColor => _textColor;
+
   double get textSize => _textSize;
+
   int get fontFamilyIndex => _fontFamilyIndex;
+
   int get fontAnimationIndex => _fontAnimationIndex;
+
   TextAlign get textAlign => _textAlign;
+
   Color get backGroundColor => _backGroundColor;
+
   bool get isFontFamily => _isFontFamily;
+
   bool get isTextAnimation => _isTextAnimation;
+
   PageController get fontFamilyController => _fontFamilyController;
+
   PageController get textAnimationController => _textAnimationController;
+
   TextEditingController get textController => _textController;
+
   List<String> get textList => _textList;
+
   TextAnimationType get animationType => _animationType;
 
   set text(String text) {
@@ -138,7 +151,7 @@ class TextEditingNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  onBackGroundChange() {
+  void onBackGroundChange() {
     if (_currentColorBackground < _textColorBackGround.length - 1) {
       _currentColorBackground += 1;
       _backGroundColor = _textColorBackGround[_currentColorBackground];
@@ -150,7 +163,7 @@ class TextEditingNotifier extends ChangeNotifier {
     }
   }
 
-  onAlignmentChange() {
+  void onAlignmentChange() {
     if (_currentAlign < _texAlignment.length - 1) {
       _currentAlign += 1;
       _textAlign = _texAlignment[_currentAlign];
@@ -162,7 +175,7 @@ class TextEditingNotifier extends ChangeNotifier {
     }
   }
 
-  onAnimationChange() {
+  void onAnimationChange() {
     if (_currentAnimation < animationList.length - 1) {
       _currentAnimation += 1;
       _animationType = animationList[_currentAnimation];
@@ -174,7 +187,7 @@ class TextEditingNotifier extends ChangeNotifier {
     }
   }
 
-  setDefaults() {
+  void setDefaults() {
     _text = '';
     _textController.text = '';
     _textColor = 0;
@@ -191,7 +204,7 @@ class TextEditingNotifier extends ChangeNotifier {
     _animationType = TextAnimationType.none;
   }
 
-  disposeController() {
+  void disposeController() {
     _textController.dispose();
     _fontFamilyController.dispose();
     _textAnimationController.dispose();

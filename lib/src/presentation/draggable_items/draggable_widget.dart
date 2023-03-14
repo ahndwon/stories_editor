@@ -16,26 +16,27 @@ import 'package:stories_editor/src/presentation/widgets/animated_onTap_button.da
 import 'package:stories_editor/src/presentation/widgets/file_image_bg.dart';
 
 class DraggableWidget extends StatelessWidget {
-  final EditableItem draggableWidget;
-  final Function(PointerDownEvent)? onPointerDown;
-  final Function(PointerUpEvent)? onPointerUp;
-  final Function(PointerMoveEvent)? onPointerMove;
-  final BuildContext context;
   const DraggableWidget({
-    Key? key,
+    super.key,
     required this.context,
     required this.draggableWidget,
     this.onPointerDown,
     this.onPointerUp,
     this.onPointerMove,
-  }) : super(key: key);
+  });
+
+  final EditableItem draggableWidget;
+  final void Function(PointerDownEvent)? onPointerDown;
+  final void Function(PointerUpEvent)? onPointerUp;
+  final void Function(PointerMoveEvent)? onPointerMove;
+  final BuildContext context;
 
   @override
   Widget build(BuildContext context) {
-    final ScreenUtil screenUtil = ScreenUtil();
-    var _colorProvider =
+    final screenUtil = ScreenUtil();
+    final colorProvider =
         Provider.of<GradientNotifier>(this.context, listen: false);
-    var _controlProvider =
+    final controlProvider =
         Provider.of<ControlNotifier>(this.context, listen: false);
     Widget? overlayWidget;
 
@@ -52,23 +53,24 @@ class DraggableWidget extends StatelessWidget {
               width: draggableWidget.deletePosition ? 100 : null,
               height: draggableWidget.deletePosition ? 100 : null,
               child: AnimatedOnTapButton(
-                onTap: () => _onTap(context, draggableWidget, _controlProvider),
+                onTap: () => _onTap(context, draggableWidget, controlProvider),
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
                     Center(
                       child: _text(
-                          background: true,
-                          paintingStyle: PaintingStyle.fill,
-                          controlNotifier: _controlProvider),
+                        background: true,
+                        paintingStyle: PaintingStyle.fill,
+                        controlNotifier: controlProvider,
+                      ),
                     ),
                     IgnorePointer(
-                      ignoring: true,
                       child: Center(
                         child: _text(
-                            background: true,
-                            paintingStyle: PaintingStyle.stroke,
-                            controlNotifier: _controlProvider),
+                          background: true,
+                          paintingStyle: PaintingStyle.stroke,
+                          controlNotifier: controlProvider,
+                        ),
                       ),
                     ),
                     Padding(
@@ -77,8 +79,9 @@ class DraggableWidget extends StatelessWidget {
                         children: [
                           Center(
                             child: _text(
-                                paintingStyle: PaintingStyle.fill,
-                                controlNotifier: _controlProvider),
+                              paintingStyle: PaintingStyle.fill,
+                              controlNotifier: controlProvider,
+                            ),
                           ),
                         ],
                       ),
@@ -93,14 +96,15 @@ class DraggableWidget extends StatelessWidget {
 
       /// image [file_image_gb.dart]
       case ItemType.image:
-        if (_controlProvider.mediaPath.isNotEmpty) {
+        if (controlProvider.mediaPath.isNotEmpty) {
           overlayWidget = SizedBox(
             width: screenUtil.screenWidth - 144.w,
             child: FileImageBG(
-              filePath: File(_controlProvider.mediaPath),
+              filePath: File(controlProvider.mediaPath),
               generatedGradient: (color1, color2) {
-                _colorProvider.color1 = color1;
-                _colorProvider.color2 = color2;
+                colorProvider
+                  ..color1 = color1
+                  ..color2 = color2;
               },
             ),
           );
@@ -123,8 +127,9 @@ class DraggableWidget extends StatelessWidget {
                   alignment: Alignment.center,
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Colors.transparent),
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.transparent,
+                  ),
                   child: GiphyRenderImage.original(gif: draggableWidget.gif),
                 ),
               ),
@@ -140,12 +145,12 @@ class DraggableWidget extends StatelessWidget {
     /// set widget data position on main screen
     return AnimatedAlignPositioned(
       duration: const Duration(milliseconds: 50),
-      dy: (draggableWidget.deletePosition
+      dy: draggableWidget.deletePosition
           ? _deleteTopOffset()
-          : (draggableWidget.position.dy * screenUtil.screenHeight)),
-      dx: (draggableWidget.deletePosition
+          : (draggableWidget.position.dy * screenUtil.screenHeight),
+      dx: draggableWidget.deletePosition
           ? 0
-          : (draggableWidget.position.dx * screenUtil.screenWidth)),
+          : (draggableWidget.position.dx * screenUtil.screenWidth),
       alignment: Alignment.center,
       child: Transform.scale(
         scale: draggableWidget.deletePosition
@@ -167,36 +172,49 @@ class DraggableWidget extends StatelessWidget {
   }
 
   /// text widget
-  Widget _text(
-      {required ControlNotifier controlNotifier,
-      required PaintingStyle paintingStyle,
-      bool background = false}) {
+  Widget _text({
+    required ControlNotifier controlNotifier,
+    required PaintingStyle paintingStyle,
+    bool background = false,
+  }) {
     if (draggableWidget.animationType == TextAnimationType.none) {
-      return Text(draggableWidget.text,
-          textAlign: draggableWidget.textAlign,
-          style: _textStyle(
-              controlNotifier: controlNotifier,
-              paintingStyle: paintingStyle,
-              background: background));
+      return Text(
+        draggableWidget.text,
+        textAlign: draggableWidget.textAlign,
+        style: _textStyle(
+          controlNotifier: controlNotifier,
+          paintingStyle: paintingStyle,
+          background: background,
+        ),
+      );
     } else {
       return DefaultTextStyle(
         style: _textStyle(
-            controlNotifier: controlNotifier,
-            paintingStyle: paintingStyle,
-            background: background),
+          controlNotifier: controlNotifier,
+          paintingStyle: paintingStyle,
+          background: background,
+        ),
         child: AnimatedTextKit(
           repeatForever: true,
           onTap: () => _onTap(context, draggableWidget, controlNotifier),
           animatedTexts: [
             if (draggableWidget.animationType == TextAnimationType.scale)
-              ScaleAnimatedText(draggableWidget.text,
-                  duration: const Duration(milliseconds: 1200)),
+              ScaleAnimatedText(
+                draggableWidget.text,
+                duration: const Duration(milliseconds: 1200),
+              ),
             if (draggableWidget.animationType == TextAnimationType.fade)
-              ...draggableWidget.textList.map((item) => FadeAnimatedText(item,
-                  duration: const Duration(milliseconds: 1200))),
+              ...draggableWidget.textList.map(
+                (item) => FadeAnimatedText(
+                  item,
+                  duration: const Duration(milliseconds: 1200),
+                ),
+              ),
             if (draggableWidget.animationType == TextAnimationType.typer)
-              TyperAnimatedText(draggableWidget.text,
-                  speed: const Duration(milliseconds: 500)),
+              TyperAnimatedText(
+                draggableWidget.text,
+                speed: const Duration(milliseconds: 500),
+              ),
             if (draggableWidget.animationType == TextAnimationType.typeWriter)
               TypewriterAnimatedText(
                 draggableWidget.text,
@@ -218,10 +236,11 @@ class DraggableWidget extends StatelessWidget {
     }
   }
 
-  _textStyle(
-      {required ControlNotifier controlNotifier,
-      required PaintingStyle paintingStyle,
-      bool background = false}) {
+  TextStyle _textStyle({
+    required ControlNotifier controlNotifier,
+    required PaintingStyle paintingStyle,
+    bool background = false,
+  }) {
     return TextStyle(
       fontFamily: controlNotifier.fontList![draggableWidget.fontFamily],
       package: controlNotifier.isCustomFontList ? null : 'stories_editor',
@@ -235,64 +254,68 @@ class DraggableWidget extends StatelessWidget {
       //           : Colors.black)
       // ]
     ).copyWith(
-        color: background ? Colors.black : draggableWidget.textColor,
-        fontSize: draggableWidget.deletePosition ? 8 : draggableWidget.fontSize,
-        background: Paint()
-          ..strokeWidth = 20.0
-          ..color = draggableWidget.backGroundColor
-          ..style = paintingStyle
-          ..strokeJoin = StrokeJoin.round
-          ..filterQuality = FilterQuality.high
-          ..strokeCap = StrokeCap.round
-          ..maskFilter = const MaskFilter.blur(BlurStyle.solid, 1));
+      color: background ? Colors.black : draggableWidget.textColor,
+      fontSize: draggableWidget.deletePosition ? 8 : draggableWidget.fontSize,
+      background: Paint()
+        ..strokeWidth = 20.0
+        ..color = draggableWidget.backGroundColor
+        ..style = paintingStyle
+        ..strokeJoin = StrokeJoin.round
+        ..filterQuality = FilterQuality.high
+        ..strokeCap = StrokeCap.round
+        ..maskFilter = const MaskFilter.blur(BlurStyle.solid, 1),
+    );
   }
 
-  _deleteTopOffset() {
-    double top = 0.0;
-    final ScreenUtil screenUtil = ScreenUtil();
+  double _deleteTopOffset() {
+    var top = 0.0;
+    final screenUtil = ScreenUtil();
     if (draggableWidget.type == ItemType.text) {
-      top = screenUtil.screenWidth / 1.2;
-      return top;
+      return top = screenUtil.screenWidth / 1.2;
     } else if (draggableWidget.type == ItemType.gif) {
-      top = screenUtil.screenWidth / 1.18;
+      return top = screenUtil.screenWidth / 1.18;
+    } else {
       return top;
     }
   }
 
-  _deleteScale() {
-    double scale = 0.0;
+  double _deleteScale() {
+    var scale = 0.0;
     if (draggableWidget.type == ItemType.text) {
-      scale = 0.4;
-      return scale;
+      return scale = 0.4;
     } else if (draggableWidget.type == ItemType.gif) {
-      scale = 0.3;
+      return scale = 0.3;
+    } else {
       return scale;
     }
   }
 
   /// onTap text
-  void _onTap(BuildContext context, EditableItem item,
-      ControlNotifier controlNotifier) {
-    var _editorProvider =
+  void _onTap(
+    BuildContext context,
+    EditableItem item,
+    ControlNotifier controlNotifier,
+  ) {
+    final editorProvider =
         Provider.of<TextEditingNotifier>(this.context, listen: false);
-    var _itemProvider =
+    final itemProvider =
         Provider.of<DraggableWidgetNotifier>(this.context, listen: false);
 
     /// load text attributes
-    _editorProvider.textController.text = item.text.trim();
-    _editorProvider.text = item.text.trim();
-    _editorProvider.fontFamilyIndex = item.fontFamily;
-    _editorProvider.textSize = item.fontSize;
-    _editorProvider.backGroundColor = item.backGroundColor;
-    _editorProvider.textAlign = item.textAlign;
-    _editorProvider.textColor =
-        controlNotifier.colorList!.indexOf(item.textColor);
-    _editorProvider.animationType = item.animationType;
-    _editorProvider.textList = item.textList;
-    _editorProvider.fontAnimationIndex = item.fontAnimationIndex;
-    _itemProvider.draggableWidget
-        .removeAt(_itemProvider.draggableWidget.indexOf(item));
-    _editorProvider.fontFamilyController = PageController(
+    editorProvider.textController.text = item.text.trim();
+    editorProvider
+      ..text = item.text.trim()
+      ..fontFamilyIndex = item.fontFamily
+      ..textSize = item.fontSize
+      ..backGroundColor = item.backGroundColor
+      ..textAlign = item.textAlign
+      ..textColor = controlNotifier.colorList!.indexOf(item.textColor)
+      ..animationType = item.animationType
+      ..textList = item.textList
+      ..fontAnimationIndex = item.fontAnimationIndex;
+    itemProvider.draggableWidget
+        .removeAt(itemProvider.draggableWidget.indexOf(item));
+    editorProvider.fontFamilyController = PageController(
       initialPage: item.fontFamily,
       viewportFraction: .1,
     );

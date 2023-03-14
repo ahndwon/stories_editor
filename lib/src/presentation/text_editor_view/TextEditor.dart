@@ -14,8 +14,9 @@ import 'package:stories_editor/src/presentation/widgets/color_selector.dart';
 import 'package:stories_editor/src/presentation/widgets/size_slider_selector.dart';
 
 class TextEditor extends StatefulWidget {
+  const TextEditor({super.key, required this.context});
+
   final BuildContext context;
-  const TextEditor({Key? key, required this.context}) : super(key: key);
 
   @override
   State<TextEditor> createState() => _TextEditorState();
@@ -25,13 +26,14 @@ class _TextEditorState extends State<TextEditor> {
   List<String> splitList = [];
   String sequenceList = '';
   String lastSequenceList = '';
+
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      final _editorNotifier =
+      final editorNotifier =
           Provider.of<TextEditingNotifier>(widget.context, listen: false);
-      _editorNotifier
-        ..textController.text = _editorNotifier.text
+      editorNotifier
+        ..textController.text = editorNotifier.text
         ..fontFamilyController = PageController(viewportFraction: .125);
     });
     super.initState();
@@ -39,130 +41,141 @@ class _TextEditorState extends State<TextEditor> {
 
   @override
   Widget build(BuildContext context) {
-    final ScreenUtil screenUtil = ScreenUtil();
+    final screenUtil = ScreenUtil();
     return Material(
-        color: Colors.transparent,
-        child: Consumer2<ControlNotifier, TextEditingNotifier>(
-          builder: (_, controlNotifier, editorNotifier, __) {
-            return Scaffold(
-              backgroundColor: Colors.transparent,
-              body: GestureDetector(
-                /// onTap => Close view and create/modify item object
-                onTap: () => _onTap(context, controlNotifier, editorNotifier),
-                child: Container(
-                    decoration:
-                        BoxDecoration(color: Colors.black.withOpacity(0.5)),
-                    height: screenUtil.screenHeight,
-                    width: screenUtil.screenWidth,
-                    child: Stack(
-                      children: [
-                        /// text field
-                        const Align(
-                          alignment: Alignment.center,
-                          child: TextFieldWidget(),
-                        ),
+      color: Colors.transparent,
+      child: Consumer2<ControlNotifier, TextEditingNotifier>(
+        builder: (_, controlNotifier, editorNotifier, __) {
+          return Scaffold(
+            backgroundColor: Colors.transparent,
+            body: GestureDetector(
+              /// onTap => Close view and create/modify item object
+              onTap: () => _onTap(context, controlNotifier, editorNotifier),
+              child: Container(
+                decoration: BoxDecoration(color: Colors.black.withOpacity(0.5)),
+                height: screenUtil.screenHeight,
+                width: screenUtil.screenWidth,
+                child: Stack(
+                  children: [
+                    /// text field
+                    const Align(
+                      child: TextFieldWidget(),
+                    ),
 
-                        /// text size
-                        const Align(
-                          alignment: Alignment.centerLeft,
-                          child: SizeSliderWidget(),
-                        ),
+                    /// text size
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: SizeSliderWidget(),
+                    ),
 
-                        /// top tools
-                        SafeArea(
-                          child: Align(
-                              alignment: Alignment.topCenter,
-                              child: TopTextTools(
-                                onDone: () => _onTap(
-                                    context, controlNotifier, editorNotifier),
-                              )),
-                        ),
-
-                        /// font family selector (bottom)
-                        Positioned(
-                          bottom: screenUtil.screenHeight * 0.21,
-                          child: Visibility(
-                            visible: editorNotifier.isFontFamily &&
-                                !editorNotifier.isTextAnimation,
-                            child: const Align(
-                              alignment: Alignment.bottomCenter,
-                              child: Padding(
-                                padding: EdgeInsets.only(bottom: 20),
-                                child: FontSelector(),
-                              ),
-                            ),
+                    /// top tools
+                    SafeArea(
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child: TopTextTools(
+                          onDone: () => _onTap(
+                            context,
+                            controlNotifier,
+                            editorNotifier,
                           ),
                         ),
+                      ),
+                    ),
 
-                        /// font color selector (bottom)
-                        Positioned(
-                          bottom: screenUtil.screenHeight * 0.21,
-                          child: Visibility(
-                              visible: !editorNotifier.isFontFamily &&
-                                  !editorNotifier.isTextAnimation,
-                              child: const Align(
-                                alignment: Alignment.bottomCenter,
-                                child: Padding(
-                                  padding: EdgeInsets.only(bottom: 20),
-                                  child: ColorSelector(),
-                                ),
-                              )),
+                    /// font family selector (bottom)
+                    Positioned(
+                      bottom: screenUtil.screenHeight * 0.21,
+                      child: Visibility(
+                        visible: editorNotifier.isFontFamily &&
+                            !editorNotifier.isTextAnimation,
+                        child: const Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Padding(
+                            padding: EdgeInsets.only(bottom: 20),
+                            child: FontSelector(),
+                          ),
                         ),
+                      ),
+                    ),
 
-                        /// font animation selector (bottom
-                        Positioned(
-                          bottom: screenUtil.screenHeight * 0.21,
-                          child: Visibility(
-                              visible: editorNotifier.isTextAnimation,
-                              child: const Align(
-                                alignment: Alignment.bottomCenter,
-                                child: Padding(
-                                  padding: EdgeInsets.only(bottom: 20),
-                                  child: AnimationSelector(),
-                                ),
-                              )),
+                    /// font color selector (bottom)
+                    Positioned(
+                      bottom: screenUtil.screenHeight * 0.21,
+                      child: Visibility(
+                        visible: !editorNotifier.isFontFamily &&
+                            !editorNotifier.isTextAnimation,
+                        child: const Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Padding(
+                            padding: EdgeInsets.only(bottom: 20),
+                            child: ColorSelector(),
+                          ),
                         ),
-                      ],
-                    )),
+                      ),
+                    ),
+
+                    /// font animation selector (bottom
+                    Positioned(
+                      bottom: screenUtil.screenHeight * 0.21,
+                      child: Visibility(
+                        visible: editorNotifier.isTextAnimation,
+                        child: const Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Padding(
+                            padding: EdgeInsets.only(bottom: 20),
+                            child: AnimationSelector(),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            );
-          },
-        ));
+            ),
+          );
+        },
+      ),
+    );
   }
 
-  void _onTap(context, ControlNotifier controlNotifier,
-      TextEditingNotifier editorNotifier) {
-    final _editableItemNotifier =
+  void _onTap(
+    BuildContext context,
+    ControlNotifier controlNotifier,
+    TextEditingNotifier editorNotifier,
+  ) {
+    final editableItemNotifier =
         Provider.of<DraggableWidgetNotifier>(context, listen: false);
 
     /// create text list
     if (editorNotifier.text.trim().isNotEmpty) {
       splitList = editorNotifier.text.split(' ');
-      for (int i = 0; i < splitList.length; i++) {
+      for (var i = 0; i < splitList.length; i++) {
         if (i == 0) {
           editorNotifier.textList.add(splitList[0]);
           sequenceList = splitList[0];
         } else {
           lastSequenceList = sequenceList;
-          editorNotifier.textList.add(sequenceList + ' ' + splitList[i]);
-          sequenceList = lastSequenceList + ' ' + splitList[i];
+          editorNotifier.textList.add('$sequenceList ${splitList[i]}');
+          sequenceList = '$lastSequenceList ${splitList[i]}';
         }
       }
 
       /// create Text Item
-      _editableItemNotifier.draggableWidget.add(EditableItem()
-        ..type = ItemType.text
-        ..text = editorNotifier.text.trim()
-        ..backGroundColor = editorNotifier.backGroundColor
-        ..textColor = controlNotifier.colorList![editorNotifier.textColor]
-        ..fontFamily = editorNotifier.fontFamilyIndex
-        ..fontSize = editorNotifier.textSize
-        ..fontAnimationIndex = editorNotifier.fontAnimationIndex
-        ..textAlign = editorNotifier.textAlign
-        ..textList = editorNotifier.textList
-        ..animationType =
-            editorNotifier.animationList[editorNotifier.fontAnimationIndex]
-        ..position = const Offset(0.0, 0.0));
+      editableItemNotifier.draggableWidget.add(
+        EditableItem()
+          ..type = ItemType.text
+          ..text = editorNotifier.text.trim()
+          ..backGroundColor = editorNotifier.backGroundColor
+          ..textColor = controlNotifier.colorList![editorNotifier.textColor]
+          ..fontFamily = editorNotifier.fontFamilyIndex
+          ..fontSize = editorNotifier.textSize
+          ..fontAnimationIndex = editorNotifier.fontAnimationIndex
+          ..textAlign = editorNotifier.textAlign
+          ..textList = editorNotifier.textList
+          ..animationType =
+              editorNotifier.animationList[editorNotifier.fontAnimationIndex]
+          ..position = Offset.zero,
+      );
       editorNotifier.setDefaults();
       controlNotifier.isTextEditing = !controlNotifier.isTextEditing;
     } else {
