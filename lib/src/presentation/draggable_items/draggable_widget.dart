@@ -19,13 +19,13 @@ class DraggableWidget extends StatelessWidget {
   const DraggableWidget({
     super.key,
     required this.context,
-    required this.draggableWidget,
+    required this.item,
     this.onPointerDown,
     this.onPointerUp,
     this.onPointerMove,
   });
 
-  final EditableItem draggableWidget;
+  final EditableItem item;
   final void Function(PointerDownEvent)? onPointerDown;
   final void Function(PointerUpEvent)? onPointerUp;
   final void Function(PointerMoveEvent)? onPointerMove;
@@ -40,7 +40,7 @@ class DraggableWidget extends StatelessWidget {
         Provider.of<ControlNotifier>(this.context, listen: false);
     Widget? overlayWidget;
 
-    switch (draggableWidget.type) {
+    switch (item.type) {
       case ItemType.text:
         overlayWidget = IntrinsicWidth(
           child: IntrinsicHeight(
@@ -50,10 +50,10 @@ class DraggableWidget extends StatelessWidget {
                 minWidth: 50,
                 maxWidth: screenUtil.screenWidth - 240.w,
               ),
-              width: draggableWidget.deletePosition ? 100 : null,
-              height: draggableWidget.deletePosition ? 100 : null,
+              width: item.deletePosition ? 100 : null,
+              height: item.deletePosition ? 100 : null,
               child: AnimatedOnTapButton(
-                onTap: () => _onTap(context, draggableWidget, controlProvider),
+                onTap: () => _onTap(context, item, controlProvider),
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
@@ -130,7 +130,7 @@ class DraggableWidget extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                     color: Colors.transparent,
                   ),
-                  child: GiphyRenderImage.original(gif: draggableWidget.gif),
+                  child: GiphyRenderImage.original(gif: item.gif),
                 ),
               ),
             ],
@@ -140,24 +140,25 @@ class DraggableWidget extends StatelessWidget {
 
       case ItemType.video:
         overlayWidget = const Center();
+        break;
     }
 
     /// set widget data position on main screen
     return AnimatedAlignPositioned(
       duration: const Duration(milliseconds: 50),
-      dy: draggableWidget.deletePosition
+      dy: item.deletePosition
           ? _deleteTopOffset()
-          : (draggableWidget.position.dy * screenUtil.screenHeight),
-      dx: draggableWidget.deletePosition
+          : (item.position.dy * screenUtil.screenHeight),
+      dx: item.deletePosition
           ? 0
-          : (draggableWidget.position.dx * screenUtil.screenWidth),
+          : (item.position.dx * screenUtil.screenWidth),
       alignment: Alignment.center,
       child: Transform.scale(
-        scale: draggableWidget.deletePosition
+        scale: item.deletePosition
             ? _deleteScale()
-            : draggableWidget.scale,
+            : item.scale,
         child: Transform.rotate(
-          angle: draggableWidget.rotation,
+          angle: item.rotation,
           child: Listener(
             onPointerDown: onPointerDown,
             onPointerUp: onPointerUp,
@@ -177,10 +178,10 @@ class DraggableWidget extends StatelessWidget {
     required PaintingStyle paintingStyle,
     bool background = false,
   }) {
-    if (draggableWidget.animationType == TextAnimationType.none) {
+    if (item.animationType == TextAnimationType.none) {
       return Text(
-        draggableWidget.text,
-        textAlign: draggableWidget.textAlign,
+        item.text,
+        textAlign: item.textAlign,
         style: _textStyle(
           controlNotifier: controlNotifier,
           paintingStyle: paintingStyle,
@@ -196,38 +197,38 @@ class DraggableWidget extends StatelessWidget {
         ),
         child: AnimatedTextKit(
           repeatForever: true,
-          onTap: () => _onTap(context, draggableWidget, controlNotifier),
+          onTap: () => _onTap(context, item, controlNotifier),
           animatedTexts: [
-            if (draggableWidget.animationType == TextAnimationType.scale)
+            if (item.animationType == TextAnimationType.scale)
               ScaleAnimatedText(
-                draggableWidget.text,
+                item.text,
                 duration: const Duration(milliseconds: 1200),
               ),
-            if (draggableWidget.animationType == TextAnimationType.fade)
-              ...draggableWidget.textList.map(
+            if (item.animationType == TextAnimationType.fade)
+              ...item.textList.map(
                 (item) => FadeAnimatedText(
                   item,
                   duration: const Duration(milliseconds: 1200),
                 ),
               ),
-            if (draggableWidget.animationType == TextAnimationType.typer)
+            if (item.animationType == TextAnimationType.typer)
               TyperAnimatedText(
-                draggableWidget.text,
+                item.text,
                 speed: const Duration(milliseconds: 500),
               ),
-            if (draggableWidget.animationType == TextAnimationType.typeWriter)
+            if (item.animationType == TextAnimationType.typeWriter)
               TypewriterAnimatedText(
-                draggableWidget.text,
+                item.text,
                 speed: const Duration(milliseconds: 500),
               ),
-            if (draggableWidget.animationType == TextAnimationType.wavy)
+            if (item.animationType == TextAnimationType.wavy)
               WavyAnimatedText(
-                draggableWidget.text,
+                item.text,
                 speed: const Duration(milliseconds: 500),
               ),
-            if (draggableWidget.animationType == TextAnimationType.flicker)
+            if (item.animationType == TextAnimationType.flicker)
               FlickerAnimatedText(
-                draggableWidget.text,
+                item.text,
                 speed: const Duration(milliseconds: 1200),
               ),
           ],
@@ -242,7 +243,7 @@ class DraggableWidget extends StatelessWidget {
     bool background = false,
   }) {
     return TextStyle(
-      fontFamily: controlNotifier.fontList![draggableWidget.fontFamily],
+      fontFamily: controlNotifier.fontList![item.fontFamily],
       package: controlNotifier.isCustomFontList ? null : 'stories_editor',
       fontWeight: FontWeight.w500,
       // shadows: <Shadow>[
@@ -254,11 +255,11 @@ class DraggableWidget extends StatelessWidget {
       //           : Colors.black)
       // ]
     ).copyWith(
-      color: background ? Colors.black : draggableWidget.textColor,
-      fontSize: draggableWidget.deletePosition ? 8 : draggableWidget.fontSize,
+      color: background ? Colors.black : item.textColor,
+      fontSize: item.deletePosition ? 8 : item.fontSize,
       background: Paint()
         ..strokeWidth = 20.0
-        ..color = draggableWidget.backGroundColor
+        ..color = item.backGroundColor
         ..style = paintingStyle
         ..strokeJoin = StrokeJoin.round
         ..filterQuality = FilterQuality.high
@@ -270,9 +271,9 @@ class DraggableWidget extends StatelessWidget {
   double _deleteTopOffset() {
     var top = 0.0;
     final screenUtil = ScreenUtil();
-    if (draggableWidget.type == ItemType.text) {
+    if (item.type == ItemType.text) {
       return top = screenUtil.screenWidth / 1.2;
-    } else if (draggableWidget.type == ItemType.gif) {
+    } else if (item.type == ItemType.gif) {
       return top = screenUtil.screenWidth / 1.18;
     } else {
       return top;
@@ -281,9 +282,9 @@ class DraggableWidget extends StatelessWidget {
 
   double _deleteScale() {
     var scale = 0.0;
-    if (draggableWidget.type == ItemType.text) {
+    if (item.type == ItemType.text) {
       return scale = 0.4;
-    } else if (draggableWidget.type == ItemType.gif) {
+    } else if (item.type == ItemType.gif) {
       return scale = 0.3;
     } else {
       return scale;

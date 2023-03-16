@@ -25,7 +25,6 @@ import 'package:stories_editor/src/presentation/text_editor_view/TextEditor.dart
 import 'package:stories_editor/src/presentation/utils/constants/app_enums.dart';
 import 'package:stories_editor/src/presentation/utils/modal_sheets.dart';
 import 'package:stories_editor/src/presentation/widgets/animated_onTap_button.dart';
-import 'package:stories_editor/src/presentation/widgets/scrollable_pageView.dart';
 
 class MainView extends StatefulWidget {
   MainView({
@@ -33,6 +32,7 @@ class MainView extends StatefulWidget {
     required this.giphyKey,
     required this.onDone,
     this.middleBottomWidget,
+    this.centerWidgetBuilder,
     this.colorList,
     this.isCustomFontList,
     this.fontFamilyList,
@@ -57,6 +57,10 @@ class MainView extends StatefulWidget {
 
   /// editor custom logo
   final Widget? middleBottomWidget;
+
+  /// editor custom logo
+  final Widget Function(BuildContext context, ScreenUtil screenUtil)?
+      centerWidgetBuilder;
 
   /// on done
   final void Function(String)? onDone;
@@ -150,28 +154,36 @@ class MainViewState extends State<MainView> {
             child,
           ) {
             return SafeArea(
-              //top: false,
-              child: ScrollablePageView(
-                scrollPhysics: controlNotifier.mediaPath.isEmpty &&
-                    itemProvider.draggableWidget.isEmpty &&
-                    !controlNotifier.isPainting &&
-                    !controlNotifier.isTextEditing,
-                pageController: scrollProvider.pageController,
-                gridController: scrollProvider.gridController,
-                mainView: buildMainView(
-                  controlNotifier,
-                  screenUtil,
-                  colorProvider,
-                  itemProvider,
-                  context,
-                  paintingProvider,
-                ),
-                gallery: buildGalleryMediaPicker(
-                  scrollProvider,
-                  itemProvider,
-                  controlNotifier,
-                ),
+              top: false,
+              child: buildMainView(
+                controlNotifier,
+                screenUtil,
+                colorProvider,
+                itemProvider,
+                context,
+                paintingProvider,
               ),
+              // child: ScrollablePageView(
+              //   scrollPhysics: controlNotifier.mediaPath.isEmpty &&
+              //       itemProvider.draggableWidget.isEmpty &&
+              //       !controlNotifier.isPainting &&
+              //       !controlNotifier.isTextEditing,
+              //   pageController: scrollProvider.pageController,
+              //   gridController: scrollProvider.gridController,
+              //   mainView: buildMainView(
+              //     controlNotifier,
+              //     screenUtil,
+              //     colorProvider,
+              //     itemProvider,
+              //     context,
+              //     paintingProvider,
+              //   ),
+              //   gallery: buildGalleryMediaPicker(
+              //     scrollProvider,
+              //     itemProvider,
+              //     controlNotifier,
+              //   ),
+              // ),
             );
           },
         ),
@@ -233,6 +245,7 @@ class MainViewState extends State<MainView> {
                           child: GestureDetector(
                             onScaleStart: _onScaleStart,
                             onScaleUpdate: _onScaleUpdate,
+                            behavior: HitTestBehavior.deferToChild,
                             child: Stack(
                               alignment: Alignment.center,
                               children: [
@@ -248,12 +261,16 @@ class MainViewState extends State<MainView> {
                                   child: Container(),
                                 ),
 
+                                widget.centerWidgetBuilder
+                                        ?.call(context, screenUtil) ??
+                                    const SizedBox(),
+
                                 ///list items
                                 ...itemProvider.draggableWidget
                                     .map((editableItem) {
                                   return DraggableWidget(
                                     context: context,
-                                    draggableWidget: editableItem,
+                                    item: editableItem,
                                     onPointerDown: (details) {
                                       _updateItemPosition(
                                         editableItem,
