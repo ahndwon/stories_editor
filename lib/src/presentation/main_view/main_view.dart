@@ -58,7 +58,7 @@ class MainView extends StatefulWidget {
   /// editor custom logo
   final Widget? middleBottomWidget;
 
-  /// editor custom logo
+  /// center widget
   final Widget Function(BuildContext context, ScreenUtil screenUtil)?
       centerWidgetBuilder;
 

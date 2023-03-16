@@ -49,11 +49,16 @@ class StoriesEditor extends StatefulWidget {
   /// gallery thumbnail quality
   final int? galleryThumbnailQuality;
 
+  /// center widget
+  final Widget Function(BuildContext context, ScreenUtil screenUtil)?
+      centerWidgetBuilder;
+
   const StoriesEditor(
-      {Key? key,
+      {super.key,
       required this.giphyKey,
       required this.onDone,
       this.middleBottomWidget,
+      this.centerWidgetBuilder,
       this.colorList,
       this.gradientColors,
       this.fontFamilyList,
@@ -61,8 +66,7 @@ class StoriesEditor extends StatefulWidget {
       this.onBackPress,
       this.onDoneButtonStyle,
       this.editorBackgroundColor,
-      this.galleryThumbnailQuality})
-      : super(key: key);
+      this.galleryThumbnailQuality});
 
   @override
   _StoriesEditorState createState() => _StoriesEditorState();
@@ -112,6 +116,7 @@ class _StoriesEditorState extends State<StoriesEditor> {
             fontFamilyList: widget.fontFamilyList,
             isCustomFontList: widget.isCustomFontList,
             middleBottomWidget: widget.middleBottomWidget,
+            centerWidgetBuilder: widget.centerWidgetBuilder,
             gradientColors: widget.gradientColors,
             colorList: widget.colorList,
             onDoneButtonStyle: widget.onDoneButtonStyle,
