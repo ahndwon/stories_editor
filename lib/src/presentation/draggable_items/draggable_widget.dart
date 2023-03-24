@@ -130,7 +130,10 @@ class DraggableWidget extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                     color: Colors.transparent,
                   ),
-                  child: GiphyRenderImage.original(gif: item.gif),
+                  child: GiphyRenderImage(
+                    key: ValueKey(item.gif.id),
+                    url: item.gif.url,
+                  ),
                 ),
               ),
             ],
@@ -149,14 +152,10 @@ class DraggableWidget extends StatelessWidget {
       dy: item.deletePosition
           ? _deleteTopOffset()
           : (item.position.dy * screenUtil.screenHeight),
-      dx: item.deletePosition
-          ? 0
-          : (item.position.dx * screenUtil.screenWidth),
+      dx: item.deletePosition ? 0 : (item.position.dx * screenUtil.screenWidth),
       alignment: Alignment.center,
       child: Transform.scale(
-        scale: item.deletePosition
-            ? _deleteScale()
-            : item.scale,
+        scale: item.deletePosition ? _deleteScale() : item.scale,
         child: Transform.rotate(
           angle: item.rotation,
           child: Listener(

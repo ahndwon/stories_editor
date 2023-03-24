@@ -12,8 +12,14 @@ class DraggableWidgetNotifier extends ChangeNotifier {
 
   GiphyGif? _gif;
   GiphyGif? get giphy => _gif;
+
   set giphy(GiphyGif? giphy) {
     _gif = giphy;
+    notifyListeners();
+  }
+
+  void remove(EditableItem item) {
+    _draggableWidget.remove(item);
     notifyListeners();
   }
 

@@ -570,8 +570,7 @@ class MainViewState extends State<MainView> {
   /// delete item widget with offset position
   void _deleteItemOnCoordinates(EditableItem item, PointerUpEvent details) {
     final itemProvider =
-        Provider.of<DraggableWidgetNotifier>(context, listen: false)
-            .draggableWidget;
+        Provider.of<DraggableWidgetNotifier>(context, listen: false);
     _inAction = false;
     if (item.type == ItemType.image) {
     } else if (item.type == ItemType.text &&
@@ -583,7 +582,7 @@ class MainViewState extends State<MainView> {
             item.position.dx >= -0.35.w &&
             item.position.dx <= 0.15) {
       setState(() {
-        itemProvider.removeAt(itemProvider.indexOf(item));
+        itemProvider.remove(item);
         HapticFeedback.heavyImpact();
       });
     } else {

@@ -32,10 +32,15 @@ Future createGiphyItem({
 
   /// create item of type GIF
   if (editableItem.giphy != null) {
+    final giphy = editableItem.giphy!;
     editableItem.draggableWidget.add(
       EditableItem()
         ..type = ItemType.gif
-        ..gif = editableItem.giphy!
+        ..gif = SimpleGiphyGif(
+          id: giphy.id,
+          url: giphy.images.original?.url ?? '',
+          stillUrl: giphy.images.originalStill?.url ?? '',
+        )
         ..position = Offset.zero,
     );
   }

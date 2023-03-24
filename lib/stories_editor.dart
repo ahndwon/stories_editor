@@ -13,9 +13,33 @@ import 'package:stories_editor/src/domain/providers/notifiers/scroll_notifier.da
 import 'package:stories_editor/src/domain/providers/notifiers/text_editing_notifier.dart';
 import 'package:stories_editor/src/presentation/main_view/main_view.dart';
 
+export 'package:stories_editor/src/domain/models/editable_items.dart';
+export 'package:stories_editor/src/domain/providers/notifiers/draggable_widget_notifier.dart';
 export 'package:stories_editor/stories_editor.dart';
 
 class StoriesEditor extends StatefulWidget {
+  const StoriesEditor({
+    super.key,
+    required this.giphyKey,
+    required this.onDone,
+    this.middleBottomWidget,
+    this.centerWidgetBuilder,
+    this.colorList,
+    this.gradientColors,
+    this.fontFamilyList,
+    this.isCustomFontList,
+    this.onBackPress,
+    this.onDoneButtonStyle,
+    this.editorBackgroundColor,
+    this.galleryThumbnailQuality,
+    this.controlController,
+    this.scrollController,
+    this.draggableWidgetController,
+    this.gradientController,
+    this.paintingController,
+    this.textEditingController,
+  });
+
   /// editor custom font families
   final List<String>? fontFamilyList;
 
@@ -32,7 +56,7 @@ class StoriesEditor extends StatefulWidget {
   final Widget? middleBottomWidget;
 
   /// on done
-  final Function(String)? onDone;
+  final void Function(String)? onDone;
 
   /// on done button Text
   final Widget? onDoneButtonStyle;
@@ -49,24 +73,16 @@ class StoriesEditor extends StatefulWidget {
   /// gallery thumbnail quality
   final int? galleryThumbnailQuality;
 
+  final ControlNotifier? controlController;
+  final ScrollNotifier? scrollController;
+  final DraggableWidgetNotifier? draggableWidgetController;
+  final GradientNotifier? gradientController;
+  final PaintingNotifier? paintingController;
+  final TextEditingNotifier? textEditingController;
+
   /// center widget
   final Widget Function(BuildContext context, ScreenUtil screenUtil)?
       centerWidgetBuilder;
-
-  const StoriesEditor(
-      {super.key,
-      required this.giphyKey,
-      required this.onDone,
-      this.middleBottomWidget,
-      this.centerWidgetBuilder,
-      this.colorList,
-      this.gradientColors,
-      this.fontFamilyList,
-      this.isCustomFontList,
-      this.onBackPress,
-      this.onDoneButtonStyle,
-      this.editorBackgroundColor,
-      this.galleryThumbnailQuality});
 
   @override
   _StoriesEditorState createState() => _StoriesEditorState();
@@ -78,10 +94,13 @@ class _StoriesEditorState extends State<StoriesEditor> {
     Paint.enableDithering = true;
     WidgetsFlutterBinding.ensureInitialized();
     SystemChrome.setPreferredOrientations(
-        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.black,
-    ));
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown],
+    );
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.black,
+      ),
+    );
     super.initState();
   }
 
@@ -103,12 +122,26 @@ class _StoriesEditorState extends State<StoriesEditor> {
         designSize: const Size(1080, 1920),
         builder: (_, __) => MultiProvider(
           providers: [
-            ChangeNotifierProvider(create: (_) => ControlNotifier()),
-            ChangeNotifierProvider(create: (_) => ScrollNotifier()),
-            ChangeNotifierProvider(create: (_) => DraggableWidgetNotifier()),
-            ChangeNotifierProvider(create: (_) => GradientNotifier()),
-            ChangeNotifierProvider(create: (_) => PaintingNotifier()),
-            ChangeNotifierProvider(create: (_) => TextEditingNotifier()),
+            ChangeNotifierProvider(
+              create: (_) => widget.controlController ?? ControlNotifier(),
+            ),
+            ChangeNotifierProvider(
+              create: (_) => widget.scrollController ?? ScrollNotifier(),
+            ),
+            ChangeNotifierProvider(
+              create: (_) =>
+                  widget.draggableWidgetController ?? DraggableWidgetNotifier(),
+            ),
+            ChangeNotifierProvider(
+              create: (_) => widget.gradientController ?? GradientNotifier(),
+            ),
+            ChangeNotifierProvider(
+              create: (_) => widget.paintingController ?? PaintingNotifier(),
+            ),
+            ChangeNotifierProvider(
+              create: (_) =>
+                  widget.textEditingController ?? TextEditingNotifier(),
+            ),
           ],
           child: MainView(
             giphyKey: widget.giphyKey,
