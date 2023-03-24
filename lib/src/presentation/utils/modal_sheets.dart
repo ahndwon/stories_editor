@@ -19,7 +19,7 @@ Future createGiphyItem({
 }) async {
   final editableItem =
       Provider.of<DraggableWidgetNotifier>(context, listen: false);
-  editableItem.giphy = await ModalGifPicker.pickModalSheetGif(
+  final giphy = await ModalGifPicker.pickModalSheetGif(
     context: context,
     apiKey: giphyKey,
     rating: GiphyRating.r,
@@ -31,8 +31,7 @@ Future createGiphyItem({
   );
 
   /// create item of type GIF
-  if (editableItem.giphy != null) {
-    final giphy = editableItem.giphy!;
+  if (giphy != null) {
     editableItem.draggableWidget.add(
       EditableItem()
         ..type = ItemType.gif
@@ -43,6 +42,7 @@ Future createGiphyItem({
         )
         ..position = Offset.zero,
     );
+    editableItem.giphy = giphy;
   }
 }
 
