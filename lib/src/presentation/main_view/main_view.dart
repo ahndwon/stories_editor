@@ -41,6 +41,8 @@ class MainView extends StatefulWidget {
     this.onDoneButtonStyle,
     this.editorBackgroundColor,
     this.galleryThumbnailQuality,
+    this.onMoveDraggable,
+    this.onRemoveDraggable,
   });
 
   /// editor custom font families
@@ -79,6 +81,12 @@ class MainView extends StatefulWidget {
 
   /// editor custom color palette list
   List<Color>? colorList;
+
+  // on move item
+  final void Function(EditableItem)? onMoveDraggable;
+
+  // item remove callback
+  final void Function(String)? onRemoveDraggable;
 
   @override
   MainViewState createState() => MainViewState();
@@ -437,8 +445,7 @@ class MainViewState extends State<MainView> {
       pathList: (path) {
         controlNotifier.mediaPath = path.first.path!;
         if (controlNotifier.mediaPath.isNotEmpty) {
-          itemProvider.draggableWidget.insert(
-            0,
+          itemProvider.insert(
             EditableItem()
               ..type = ItemType.image
               ..position = Offset.zero,
@@ -543,6 +550,7 @@ class MainViewState extends State<MainView> {
 
   /// active delete widget with offset position
   void _deletePosition(EditableItem item, PointerMoveEvent details) {
+    widget.onMoveDraggable?.call(item);
     if (item.type == ItemType.text &&
         item.position.dy >= 0.75.h &&
         item.position.dx >= -0.4.w &&
@@ -582,7 +590,8 @@ class MainViewState extends State<MainView> {
             item.position.dx >= -0.35.w &&
             item.position.dx <= 0.15) {
       setState(() {
-        itemProvider.remove(item);
+        itemProvider.remove(item.id);
+        widget.onRemoveDraggable?.call(item.id);
         HapticFeedback.heavyImpact();
       });
     } else {

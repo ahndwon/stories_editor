@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-class ColorConverter implements JsonConverter<Color, String> {
+class ColorConverter implements JsonConverter<Color, int> {
   const ColorConverter();
 
   @override
-  Color fromJson(String value) => Color(int.parse(value));
+  Color fromJson(int value) => Color(value);
 
   @override
-  String toJson(Color value) => value.toString();
+  int toJson(Color value) => value.value;
 }

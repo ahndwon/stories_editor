@@ -32,7 +32,7 @@ Future createGiphyItem({
 
   /// create item of type GIF
   if (giphy != null) {
-    editableItem.draggableWidget.add(
+    editableItem.insert(
       EditableItem()
         ..type = ItemType.gif
         ..gif = SimpleGiphyGif(
@@ -42,7 +42,7 @@ Future createGiphyItem({
         )
         ..position = Offset.zero,
     );
-    editableItem.giphy = giphy;
+    // editableItem.giphy = giphy;
   }
 }
 

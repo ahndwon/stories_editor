@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:stories_editor/src/domain/models/editable_items.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/control_provider.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/draggable_widget_notifier.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/gradient_notifier.dart';
@@ -38,6 +39,9 @@ class StoriesEditor extends StatefulWidget {
     this.gradientController,
     this.paintingController,
     this.textEditingController,
+    this.onAddDraggable,
+    this.onMoveDraggable,
+    this.onRemoveDraggable,
   });
 
   /// editor custom font families
@@ -79,16 +83,19 @@ class StoriesEditor extends StatefulWidget {
   final GradientNotifier? gradientController;
   final PaintingNotifier? paintingController;
   final TextEditingNotifier? textEditingController;
+  final void Function(EditableItem)? onAddDraggable;
+  final void Function(EditableItem)? onMoveDraggable;
+  final void Function(String)? onRemoveDraggable;
 
   /// center widget
   final Widget Function(BuildContext context, ScreenUtil screenUtil)?
       centerWidgetBuilder;
 
   @override
-  _StoriesEditorState createState() => _StoriesEditorState();
+  StoriesEditorState createState() => StoriesEditorState();
 }
 
-class _StoriesEditorState extends State<StoriesEditor> {
+class StoriesEditorState extends State<StoriesEditor> {
   @override
   void initState() {
     Paint.enableDithering = true;
@@ -113,6 +120,9 @@ class _StoriesEditorState extends State<StoriesEditor> {
 
   @override
   Widget build(BuildContext context) {
+    final draggableWidgetNotifier = (widget.draggableWidgetController ??
+        DraggableWidgetNotifier())
+      ..onAddDraggable = widget.onAddDraggable;
     return NotificationListener<OverscrollIndicatorNotification>(
       onNotification: (overscroll) {
         overscroll.disallowIndicator();
@@ -129,8 +139,7 @@ class _StoriesEditorState extends State<StoriesEditor> {
               create: (_) => widget.scrollController ?? ScrollNotifier(),
             ),
             ChangeNotifierProvider(
-              create: (_) =>
-                  widget.draggableWidgetController ?? DraggableWidgetNotifier(),
+              create: (_) => draggableWidgetNotifier,
             ),
             ChangeNotifierProvider(
               create: (_) => widget.gradientController ?? GradientNotifier(),
@@ -156,6 +165,8 @@ class _StoriesEditorState extends State<StoriesEditor> {
             onBackPress: widget.onBackPress,
             editorBackgroundColor: widget.editorBackgroundColor,
             galleryThumbnailQuality: widget.galleryThumbnailQuality,
+            onMoveDraggable: widget.onMoveDraggable,
+            onRemoveDraggable: widget.onRemoveDraggable,
           ),
         ),
       ),

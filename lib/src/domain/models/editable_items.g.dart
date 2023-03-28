@@ -7,6 +7,7 @@ part of 'editable_items.dart';
 // **************************************************************************
 
 EditableItem _$EditableItemFromJson(Map<String, dynamic> json) => EditableItem()
+  ..id = json['id'] as String
   ..deletePosition = json['deletePosition'] as bool
   ..position =
       const OffsetConverter().fromJson(json['position'] as Map<String, dynamic>)
@@ -16,19 +17,20 @@ EditableItem _$EditableItemFromJson(Map<String, dynamic> json) => EditableItem()
   ..text = json['text'] as String
   ..textList =
       (json['textList'] as List<dynamic>).map((e) => e as String).toList()
-  ..textColor = const ColorConverter().fromJson(json['textColor'] as String)
+  ..textColor = const ColorConverter().fromJson(json['textColor'] as int)
   ..textAlign = $enumDecode(_$TextAlignEnumMap, json['textAlign'])
   ..fontSize = (json['fontSize'] as num).toDouble()
   ..fontFamily = json['fontFamily'] as int
   ..fontAnimationIndex = json['fontAnimationIndex'] as int
   ..backGroundColor =
-      const ColorConverter().fromJson(json['backGroundColor'] as String)
+      const ColorConverter().fromJson(json['backGroundColor'] as int)
   ..animationType =
       $enumDecode(_$TextAnimationTypeEnumMap, json['animationType'])
   ..gif = SimpleGiphyGif.fromJson(json['gif'] as Map<String, dynamic>);
 
 Map<String, dynamic> _$EditableItemToJson(EditableItem instance) =>
     <String, dynamic>{
+      'id': instance.id,
       'deletePosition': instance.deletePosition,
       'position': const OffsetConverter().toJson(instance.position),
       'scale': instance.scale,

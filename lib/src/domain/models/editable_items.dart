@@ -3,11 +3,14 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:stories_editor/src/domain/converters/color_converter.dart';
 import 'package:stories_editor/src/domain/converters/offset_converter.dart';
 import 'package:stories_editor/src/presentation/utils/constants/app_enums.dart';
+import 'package:uuid/uuid.dart';
 
 part 'editable_items.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class EditableItem {
+  String id = const Uuid().v4();
+
   /// delete
   bool deletePosition = false;
 
