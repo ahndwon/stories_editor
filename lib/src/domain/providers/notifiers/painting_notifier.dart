@@ -29,14 +29,23 @@ class PaintingNotifier extends ChangeNotifier {
       StreamController<PaintingModel>.broadcast();
 
   List<PaintingModel> get lines => _lines;
+
   int get lineColor => _lineColor;
+
   double get lineWidth => _lineWidth;
+
   int get selectedToolIndex => _selectedToolIndex;
+
   StreamController<List<PaintingModel>> get linesStreamController =>
       _linesStreamController;
+
   StreamController<PaintingModel> get currentLineStreamController =>
       _currentLineStreamController;
+
   PaintingType get paintingType => _paintingType;
+
+  void Function(String paintingId)? onRemove;
+  void Function(PaintingModel painting)? onAdd;
 
   set lines(List<PaintingModel> line) {
     _lines = line;
@@ -84,7 +93,8 @@ class PaintingNotifier extends ChangeNotifier {
 
   removeLast() {
     if (_lines.isNotEmpty) {
-      _lines.removeLast();
+      final last = _lines.removeLast();
+      onRemove?.call(last.id);
       notifyListeners();
     } else {
       _lines = [];

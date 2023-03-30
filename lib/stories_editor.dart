@@ -15,7 +15,9 @@ import 'package:stories_editor/src/domain/providers/notifiers/text_editing_notif
 import 'package:stories_editor/src/presentation/main_view/main_view.dart';
 
 export 'package:stories_editor/src/domain/models/editable_items.dart';
+export 'package:stories_editor/src/domain/models/painting_model.dart';
 export 'package:stories_editor/src/domain/providers/notifiers/draggable_widget_notifier.dart';
+export 'package:stories_editor/src/domain/providers/notifiers/painting_notifier.dart';
 export 'package:stories_editor/stories_editor.dart';
 
 class StoriesEditor extends StatefulWidget {

@@ -17,6 +17,8 @@ class DraggableWidgetNotifier extends ChangeNotifier {
 
   GiphyGif? get giphy => _gif;
 
+  void Function(EditableItem item)? onMoveFinish;
+
   // set giphy(GiphyGif? giphy) {
   //   _gif = giphy;
   //   notifyListeners();

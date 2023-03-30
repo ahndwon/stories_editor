@@ -6,8 +6,8 @@ class OffsetConverter implements JsonConverter<Offset, Map<String, dynamic>> {
 
   @override
   Offset fromJson(Map<String, dynamic> value) => Offset(
-        value['dx'] as double,
-        value['dy'] as double,
+        double.parse(value['dx'].toString()),
+        double.parse(value['dy'].toString()),
       );
 
   @override

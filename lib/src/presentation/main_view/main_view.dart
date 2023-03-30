@@ -595,6 +595,7 @@ class MainViewState extends State<MainView> {
         HapticFeedback.heavyImpact();
       });
     } else {
+      itemProvider.onMoveFinish?.call(item);
       setState(() {
         _activeItem = null;
       });

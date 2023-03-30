@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:perfect_freehand/perfect_freehand.dart';
+import 'package:stories_editor/src/domain/converters/color_converter.dart';
+import 'package:stories_editor/src/domain/converters/point_converter.dart';
 import 'package:stories_editor/src/presentation/utils/constants/app_enums.dart';
+import 'package:uuid/uuid.dart';
 
+part 'painting_model.g.dart';
+
+@PointConverter()
+@ColorConverter()
+@JsonSerializable(explicitToJson: true)
 class PaintingModel {
   /// lines coordinates
   List<Point> points;
@@ -30,14 +39,22 @@ class PaintingModel {
   /// painting type
   PaintingType paintingType = PaintingType.pen;
 
+  String id = const Uuid().v4();
+
   PaintingModel(
-      this.points,
-      this.size,
-      this.thinning,
-      this.smoothing,
-      this.isComplete,
-      this.lineColor,
-      this.streamline,
-      this.simulatePressure,
-      this.paintingType);
+    this.points,
+    this.size,
+    this.thinning,
+    this.smoothing,
+    this.isComplete,
+    this.lineColor,
+    this.streamline,
+    this.simulatePressure,
+    this.paintingType,
+  );
+
+  static PaintingModel fromJson(Map<String, dynamic> json) =>
+      _$PaintingModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PaintingModelToJson(this);
 }
