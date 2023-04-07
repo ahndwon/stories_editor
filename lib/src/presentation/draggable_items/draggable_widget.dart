@@ -133,6 +133,7 @@ class DraggableWidget extends StatelessWidget {
                   child: GiphyRenderImage(
                     key: ValueKey(item.gif.id),
                     url: item.gif.url,
+                    renderGiphyOverlay: false,
                   ),
                 ),
               ),
