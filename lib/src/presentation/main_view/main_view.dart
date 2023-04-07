@@ -279,6 +279,8 @@ class MainViewState extends State<MainView> {
                                   return DraggableWidget(
                                     context: context,
                                     item: editableItem,
+                                    isSelected:
+                                        editableItem.id == _activeItem?.id,
                                     onPointerDown: (details) {
                                       _updateItemPosition(
                                         editableItem,

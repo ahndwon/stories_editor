@@ -23,6 +23,7 @@ class DraggableWidget extends StatelessWidget {
     this.onPointerDown,
     this.onPointerUp,
     this.onPointerMove,
+    this.isSelected = false,
   });
 
   final EditableItem item;
@@ -30,6 +31,7 @@ class DraggableWidget extends StatelessWidget {
   final void Function(PointerUpEvent)? onPointerUp;
   final void Function(PointerMoveEvent)? onPointerMove;
   final BuildContext context;
+  final bool isSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +41,11 @@ class DraggableWidget extends StatelessWidget {
     final controlProvider =
         Provider.of<ControlNotifier>(this.context, listen: false);
     Widget? overlayWidget;
+
+    BoxDecoration? decoration;
+    if (isSelected) {
+      decoration = BoxDecoration(border: Border.all(color: Colors.white));
+    }
 
     switch (item.type) {
       case ItemType.text:
@@ -50,6 +57,7 @@ class DraggableWidget extends StatelessWidget {
                 minWidth: 50,
                 maxWidth: screenUtil.screenWidth - 240.w,
               ),
+              decoration: decoration,
               width: item.deletePosition ? 100 : null,
               height: item.deletePosition ? 100 : null,
               child: AnimatedOnTapButton(
@@ -126,10 +134,7 @@ class DraggableWidget extends StatelessWidget {
                 child: Container(
                   alignment: Alignment.center,
                   padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.transparent,
-                  ),
+                  decoration: isSelected ? decoration : const BoxDecoration(),
                   child: GiphyRenderImage(
                     key: ValueKey(item.gif.id),
                     url: item.gif.url,
