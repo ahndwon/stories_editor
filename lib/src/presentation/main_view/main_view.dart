@@ -209,6 +209,7 @@ class MainViewState extends State<MainView> {
   ) {
     return Column(
       children: [
+        /// bottom tools
         Expanded(
           child: Stack(
             alignment: Alignment.center,
@@ -224,7 +225,7 @@ class MainViewState extends State<MainView> {
                       !controlNotifier.isTextEditing;
                 },
                 child: Align(
-                  alignment: Alignment.topCenter,
+                  // alignment: Alignment.topCenter,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(25),
                     child: SizedBox(
@@ -321,6 +322,11 @@ class MainViewState extends State<MainView> {
                   ),
                 ),
               ),
+              if (!kIsWeb)
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: buildBottomTools(),
+                ),
 
               /// middle text
               if (itemProvider.draggableWidget.isEmpty &&
@@ -349,24 +355,24 @@ class MainViewState extends State<MainView> {
                   ),
                 ),
 
-              /// top tools
-              Visibility(
-                visible: !controlNotifier.isTextEditing &&
-                    !controlNotifier.isPainting,
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  child: TopTools(
-                    contentKey: contentKey,
-                    context: context,
-                  ),
-                ),
-              ),
-
               /// delete item when the item is in position
               DeleteItem(
                 activeItem: _activeItem,
                 animationsDuration: const Duration(milliseconds: 300),
                 isDeletePosition: _isDeletePosition,
+              ),
+
+              /// top tools
+              Visibility(
+                visible: !controlNotifier.isTextEditing &&
+                    !controlNotifier.isPainting,
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: TopTools(
+                    contentKey: contentKey,
+                    context: context,
+                  ),
+                ),
               ),
 
               /// show text editor
@@ -385,9 +391,6 @@ class MainViewState extends State<MainView> {
             ],
           ),
         ),
-
-        /// bottom tools
-        if (!kIsWeb) buildBottomTools(),
       ],
     );
   }

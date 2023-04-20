@@ -29,11 +29,12 @@ class BottomTools extends StatelessWidget {
     return Consumer3<ControlNotifier, ScrollNotifier, DraggableWidgetNotifier>(
       builder: (_, controlNotifier, scrollNotifier, itemNotifier, __) {
         return Container(
+          height: 110,
           decoration: const BoxDecoration(color: Colors.transparent),
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 40.h),
+            // padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 40.h),
+            padding: EdgeInsets.fromLTRB(40.w, 40, 40.w, 0),
             child: Row(
-              mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 /// preview gallery
