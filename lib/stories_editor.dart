@@ -16,6 +16,7 @@ import 'package:stories_editor/src/presentation/main_view/main_view.dart';
 
 export 'package:stories_editor/src/domain/models/editable_items.dart';
 export 'package:stories_editor/src/domain/models/painting_model.dart';
+export 'package:stories_editor/src/domain/providers/notifiers/control_provider.dart';
 export 'package:stories_editor/src/domain/providers/notifiers/draggable_widget_notifier.dart';
 export 'package:stories_editor/src/domain/providers/notifiers/painting_notifier.dart';
 export 'package:stories_editor/stories_editor.dart';

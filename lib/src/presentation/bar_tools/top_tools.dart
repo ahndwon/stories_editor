@@ -29,10 +29,11 @@ class _TopToolsState extends State<TopTools> {
       builder: (_, controlNotifier, paintingNotifier, itemNotifier, __) {
         return SafeArea(
           child: Container(
+            height: 60,
             padding: EdgeInsets.symmetric(vertical: 20.w),
             decoration: const BoxDecoration(color: Colors.transparent),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
               children: [
                 /// close button
                 ToolButton(
@@ -149,6 +150,124 @@ class _TopToolsState extends State<TopTools> {
                 ),
               ],
             ),
+            // child: Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //   children: [
+            //     /// close button
+            //     ToolButton(
+            //       backGroundColor: Colors.black12,
+            //       onTap: () async {
+            //         final res = await exitDialog(
+            //           context: widget.context,
+            //           contentKey: widget.contentKey,
+            //         );
+            //         if (res) {
+            //           Navigator.pop(context);
+            //         }
+            //       },
+            //       child: const Icon(
+            //         Icons.close,
+            //         color: Colors.white,
+            //       ),
+            //     ),
+            //     if (controlNotifier.mediaPath.isEmpty)
+            //       _selectColor(
+            //         controlProvider: controlNotifier,
+            //         onTap: () {
+            //           if (controlNotifier.gradientIndex >=
+            //               controlNotifier.gradientColors!.length - 1) {
+            //             setState(() {
+            //               controlNotifier.gradientIndex = 0;
+            //             });
+            //           } else {
+            //             setState(() {
+            //               controlNotifier.gradientIndex += 1;
+            //             });
+            //           }
+            //         },
+            //       ),
+            //     ToolButton(
+            //       backGroundColor: Colors.black12,
+            //       onTap: () async {
+            //         if (paintingNotifier.lines.isNotEmpty ||
+            //             itemNotifier.draggableWidget.isNotEmpty) {
+            //           final response = await takePicture(
+            //             contentKey: widget.contentKey,
+            //             context: context,
+            //             saveToGallery: true,
+            //           );
+            //           if (response == true) {
+            //             await Fluttertoast.showToast(msg: 'Successfully saved');
+            //           } else {
+            //             await Fluttertoast.showToast(msg: 'Error');
+            //           }
+            //         }
+            //       },
+            //       child: const ImageIcon(
+            //         AssetImage(
+            //           'assets/icons/download.png',
+            //           package: 'stories_editor',
+            //         ),
+            //         color: Colors.white,
+            //         size: 20,
+            //       ),
+            //     ),
+            //     ToolButton(
+            //       backGroundColor: Colors.black12,
+            //       onTap: () => createGiphyItem(
+            //         context: context,
+            //         giphyKey: controlNotifier.giphyKey,
+            //       ),
+            //       child: const ImageIcon(
+            //         AssetImage(
+            //           'assets/icons/stickers.png',
+            //           package: 'stories_editor',
+            //         ),
+            //         color: Colors.white,
+            //         size: 20,
+            //       ),
+            //     ),
+            //     ToolButton(
+            //       backGroundColor: Colors.black12,
+            //       onTap: () {
+            //         controlNotifier.isPainting = true;
+            //         //createLinePainting(context: context);
+            //       },
+            //       child: const ImageIcon(
+            //         AssetImage(
+            //           'assets/icons/draw.png',
+            //           package: 'stories_editor',
+            //         ),
+            //         color: Colors.white,
+            //         size: 20,
+            //       ),
+            //     ),
+            //     // ToolButton(
+            //     //   child: ImageIcon(
+            //     //     const AssetImage('assets/icons/photo_filter.png',
+            //     //         package: 'stories_editor'),
+            //     //     color: controlNotifier.isPhotoFilter ? Colors.black : Colors.white,
+            //     //     size: 20,
+            //     //   ),
+            //     //   backGroundColor:  controlNotifier.isPhotoFilter ? Colors.white70 : Colors.black12,
+            //     //   onTap: () => controlNotifier.isPhotoFilter =
+            //     //   !controlNotifier.isPhotoFilter,
+            //     // ),
+            //     ToolButton(
+            //       backGroundColor: Colors.black12,
+            //       onTap: () => controlNotifier.isTextEditing =
+            //           !controlNotifier.isTextEditing,
+            //       child: const ImageIcon(
+            //         AssetImage(
+            //           'assets/icons/text.png',
+            //           package: 'stories_editor',
+            //         ),
+            //         color: Colors.white,
+            //         size: 20,
+            //       ),
+            //     ),
+            //   ],
+            // ),
           ),
         );
       },
