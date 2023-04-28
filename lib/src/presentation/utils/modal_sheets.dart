@@ -215,7 +215,9 @@ void _resetDefaults({required BuildContext context}) {
   final controlProvider = Provider.of<ControlNotifier>(context, listen: false);
   final editingProvider =
       Provider.of<TextEditingNotifier>(context, listen: false);
-  paintingProvider.lines.clear();
+  if (paintingProvider.lines.isNotEmpty) {
+    paintingProvider.lines.clear();
+  }
   widgetProvider.draggableWidget.clear();
   widgetProvider.setDefaults();
   paintingProvider.resetDefaults();
