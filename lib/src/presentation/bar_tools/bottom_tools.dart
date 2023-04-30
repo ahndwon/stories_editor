@@ -134,59 +134,7 @@ class BottomTools extends StatelessWidget {
                     alignment: Alignment.centerRight,
                     child: Transform.scale(
                       scale: 0.9,
-                      child: AnimatedOnTapButton(
-                        onTap: () async {
-                          String pngUri;
-                          await takePicture(
-                            contentKey: contentKey,
-                            context: context,
-                            saveToGallery: false,
-                          ).then((bytes) {
-                            if (bytes != null) {
-                              pngUri = bytes as String;
-                              onDone(pngUri);
-                            } else {}
-                          });
-                        },
-                        child: onDoneButtonStyle ??
-                            Container(
-                              padding: const EdgeInsets.only(
-                                left: 12,
-                                right: 5,
-                                top: 4,
-                                bottom: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(15),
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 1.5,
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: const [
-                                  Text(
-                                    'Share',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      letterSpacing: 1.5,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.only(left: 5),
-                                    child: Icon(
-                                      Icons.arrow_forward_ios,
-                                      color: Colors.white,
-                                      size: 15,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                      ),
+                      child: buildShareButton(context),
                     ),
                   ),
                 ),
@@ -195,6 +143,62 @@ class BottomTools extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  Widget buildShareButton(BuildContext context) {
+    return AnimatedOnTapButton(
+      onTap: () async {
+        String pngUri;
+        await takePicture(
+          contentKey: contentKey,
+          context: context,
+          saveToGallery: false,
+        ).then((bytes) {
+          if (bytes != null) {
+            pngUri = bytes as String;
+            onDone(pngUri);
+          } else {}
+        });
+      },
+      child: onDoneButtonStyle ??
+          Container(
+            padding: const EdgeInsets.only(
+              left: 12,
+              right: 5,
+              top: 4,
+              bottom: 4,
+            ),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(
+                color: Colors.white,
+                width: 1.5,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text(
+                  'Share',
+                  style: TextStyle(
+                    color: Colors.white,
+                    letterSpacing: 1.5,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 5),
+                  child: Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.white,
+                    size: 15,
+                  ),
+                ),
+              ],
+            ),
+          ),
     );
   }
 

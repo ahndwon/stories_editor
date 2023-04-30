@@ -218,7 +218,9 @@ void _resetDefaults({required BuildContext context}) {
   if (paintingProvider.lines.isNotEmpty) {
     paintingProvider.lines.clear();
   }
-  widgetProvider.draggableWidget.clear();
+  if (widgetProvider.draggableWidget.isNotEmpty) {
+    widgetProvider.draggableWidget.clear();
+  }
   widgetProvider.setDefaults();
   paintingProvider.resetDefaults();
   editingProvider.setDefaults();
