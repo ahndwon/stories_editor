@@ -15,8 +15,8 @@ import 'package:stories_editor/src/domain/providers/notifiers/gradient_notifier.
 import 'package:stories_editor/src/domain/providers/notifiers/painting_notifier.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/scroll_notifier.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/text_editing_notifier.dart';
-import 'package:stories_editor/src/presentation/bar_tools/bottom_tools.dart';
-import 'package:stories_editor/src/presentation/bar_tools/top_tools.dart';
+import 'package:stories_editor/src/presentation/bar_tools/main_tools.dart';
+import 'package:stories_editor/src/presentation/bar_tools/top_tool_bar.dart';
 import 'package:stories_editor/src/presentation/draggable_items/delete_item.dart';
 import 'package:stories_editor/src/presentation/draggable_items/draggable_widget.dart';
 import 'package:stories_editor/src/presentation/painting_view/painting.dart';
@@ -43,6 +43,9 @@ class MainView extends StatefulWidget {
     this.galleryThumbnailQuality,
     this.onMoveDraggable,
     this.onRemoveDraggable,
+    this.onChatButtonClick,
+    this.title,
+    this.actions,
   });
 
   /// editor custom font families
@@ -59,6 +62,9 @@ class MainView extends StatefulWidget {
 
   /// editor custom logo
   final Widget? middleBottomWidget;
+
+  /// widget for title
+  final Widget? title;
 
   /// center widget
   final Widget Function(BuildContext context, ScreenUtil screenUtil)?
@@ -87,6 +93,12 @@ class MainView extends StatefulWidget {
 
   // item remove callback
   final void Function(String)? onRemoveDraggable;
+
+  // chat button click callback
+  final void Function()? onChatButtonClick;
+
+  // top tool bar actions
+  final List<Widget>? actions;
 
   @override
   MainViewState createState() => MainViewState();
@@ -325,7 +337,7 @@ class MainViewState extends State<MainView> {
               if (!kIsWeb)
                 Align(
                   alignment: Alignment.topCenter,
-                  child: buildBottomTools(),
+                  child: buildTopToolBar(),
                 ),
 
               /// middle text
@@ -362,16 +374,22 @@ class MainViewState extends State<MainView> {
                 isDeletePosition: _isDeletePosition,
               ),
 
-              /// top tools
-              Visibility(
-                visible: !controlNotifier.isTextEditing &&
-                    !controlNotifier.isPainting,
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: TopTools(
-                    contentKey: contentKey,
-                    context: context,
-                  ),
+              /// bottom tools
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    buildHelpTools(),
+                    Visibility(
+                      visible: !controlNotifier.isTextEditing &&
+                          !controlNotifier.isPainting,
+                      child: MainTools(
+                        contentKey: contentKey,
+                        context: context,
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
@@ -421,8 +439,8 @@ class MainViewState extends State<MainView> {
     );
   }
 
-  BottomTools buildBottomTools() {
-    return BottomTools(
+  Widget buildTopToolBar() {
+    return TopToolBar(
       contentKey: contentKey,
       onDone: (bytes) {
         setState(() {
@@ -431,6 +449,8 @@ class MainViewState extends State<MainView> {
       },
       onDoneButtonStyle: widget.onDoneButtonStyle,
       editorBackgroundColor: widget.editorBackgroundColor,
+      actions: widget.actions,
+      title: widget.title,
     );
   }
 
@@ -625,5 +645,36 @@ class MainViewState extends State<MainView> {
 
     /// set vibrate
     HapticFeedback.lightImpact();
+  }
+
+  Widget buildHelpTools() {
+    return Row(
+      children: [
+        IconButton(
+          icon: const Icon(
+            Icons.navigate_before_rounded,
+            color: Colors.white,
+            size: 32,
+          ),
+          onPressed: () {},
+        ),
+        IconButton(
+          icon: const Icon(
+            Icons.navigate_next_rounded,
+            color: Colors.white,
+            size: 32,
+          ),
+          onPressed: () {},
+        ),
+        const Expanded(child: SizedBox()),
+        IconButton(
+          icon: const Icon(
+            Icons.chat_bubble,
+            color: Colors.white,
+          ),
+          onPressed: widget.onChatButtonClick,
+        ),
+      ],
+    );
   }
 }

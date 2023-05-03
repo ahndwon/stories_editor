@@ -45,6 +45,9 @@ class StoriesEditor extends StatefulWidget {
     this.onAddDraggable,
     this.onMoveDraggable,
     this.onRemoveDraggable,
+    this.onChatButtonClick,
+    this.actions,
+    this.title,
   });
 
   /// editor custom font families
@@ -80,6 +83,12 @@ class StoriesEditor extends StatefulWidget {
   /// gallery thumbnail quality
   final int? galleryThumbnailQuality;
 
+  // top tool bar actions
+  final List<Widget>? actions;
+
+  // widget for title
+  final Widget? title;
+
   final ControlNotifier? controlController;
   final ScrollNotifier? scrollController;
   final DraggableWidgetNotifier? draggableWidgetController;
@@ -89,6 +98,7 @@ class StoriesEditor extends StatefulWidget {
   final void Function(EditableItem)? onAddDraggable;
   final void Function(EditableItem)? onMoveDraggable;
   final void Function(String)? onRemoveDraggable;
+  final void Function()? onChatButtonClick;
 
   /// center widget
   final Widget Function(BuildContext context, ScreenUtil screenUtil)?
@@ -170,6 +180,9 @@ class StoriesEditorState extends State<StoriesEditor> {
             galleryThumbnailQuality: widget.galleryThumbnailQuality,
             onMoveDraggable: widget.onMoveDraggable,
             onRemoveDraggable: widget.onRemoveDraggable,
+            onChatButtonClick: widget.onChatButtonClick,
+            actions: widget.actions,
+            title: widget.title,
           ),
         ),
       ),

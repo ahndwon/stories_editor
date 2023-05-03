@@ -10,18 +10,17 @@ import 'package:stories_editor/src/presentation/utils/modal_sheets.dart';
 import 'package:stories_editor/src/presentation/widgets/animated_onTap_button.dart';
 import 'package:stories_editor/src/presentation/widgets/tool_button.dart';
 
-class TopTools extends StatefulWidget {
+class MainTools extends StatefulWidget {
+  const MainTools({super.key, required this.contentKey, required this.context});
+
   final GlobalKey contentKey;
   final BuildContext context;
 
-  const TopTools({Key? key, required this.contentKey, required this.context})
-      : super(key: key);
-
   @override
-  _TopToolsState createState() => _TopToolsState();
+  MainToolsState createState() => MainToolsState();
 }
 
-class _TopToolsState extends State<TopTools> {
+class MainToolsState extends State<MainTools> {
   @override
   Widget build(BuildContext context) {
     return Consumer3<ControlNotifier, PaintingNotifier,
