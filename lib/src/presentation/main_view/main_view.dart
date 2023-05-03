@@ -121,6 +121,8 @@ class MainViewState extends State<MainView> {
   bool _isDeletePosition = false;
   bool _inAction = false;
 
+  Map<String, GlobalKey> draggableKeys = {};
+
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -219,6 +221,8 @@ class MainViewState extends State<MainView> {
     BuildContext context,
     PaintingNotifier paintingProvider,
   ) {
+    var index = 0;
+
     return Column(
       children: [
         /// bottom tools
@@ -287,9 +291,12 @@ class MainViewState extends State<MainView> {
                                     const SizedBox(),
 
                                 ///list items
-                                ...itemProvider.draggableWidget
+                                ...itemProvider
+                                    .getDistinctDraggableWidget()
+                                    .toList()
                                     .map((editableItem) {
                                   return DraggableWidget(
+                                    key: _getOrAddKey(editableItem),
                                     context: context,
                                     item: editableItem,
                                     isSelected:
@@ -411,6 +418,16 @@ class MainViewState extends State<MainView> {
         ),
       ],
     );
+  }
+
+  GlobalKey<State<StatefulWidget>> _getOrAddKey(EditableItem editableItem) {
+    final key = draggableKeys[editableItem.id];
+    if (key != null) {
+      return key;
+    }
+    final newKey = GlobalKey();
+    draggableKeys[editableItem.id] = newKey;
+    return newKey;
   }
 
   Widget buildFingerPaint(

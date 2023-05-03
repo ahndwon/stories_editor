@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:modal_gif_picker/modal_gif_picker.dart';
 import 'package:stories_editor/src/domain/models/editable_items.dart';
@@ -39,5 +41,13 @@ class DraggableWidgetNotifier extends ChangeNotifier {
 
   void setDefaults() {
     _draggableWidget = [];
+  }
+
+  Set<EditableItem> getDistinctDraggableWidget() {
+    var newDraggableWidget = <EditableItem>{};
+    if (draggableWidget.isNotEmpty) {
+      newDraggableWidget = SplayTreeSet<EditableItem>.from(draggableWidget);
+    }
+    return newDraggableWidget;
   }
 }

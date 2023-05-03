@@ -8,7 +8,7 @@ import 'package:uuid/uuid.dart';
 part 'editable_items.g.dart';
 
 @JsonSerializable(explicitToJson: true)
-class EditableItem {
+class EditableItem implements Comparable<EditableItem> {
   String id = const Uuid().v4();
 
   /// delete
@@ -41,6 +41,9 @@ class EditableItem {
       _$EditableItemFromJson(value);
 
   Map<String, dynamic> toJson() => _$EditableItemToJson(this);
+
+  @override
+  int compareTo(EditableItem other) => other.id.compareTo(id);
 }
 
 @JsonSerializable()
