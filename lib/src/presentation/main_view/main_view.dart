@@ -482,17 +482,20 @@ class MainViewState extends State<MainView> {
   }
 
   Widget buildTopToolBar() {
-    return TopToolBar(
-      contentKey: contentKey,
-      onDone: (bytes) {
-        setState(() {
-          widget.onDone!(bytes);
-        });
-      },
-      onDoneButtonStyle: widget.onDoneButtonStyle,
-      editorBackgroundColor: widget.editorBackgroundColor,
-      actions: widget.actions,
-      title: widget.title,
+    return Padding(
+      padding: const EdgeInsets.only(top: 24),
+      child: TopToolBar(
+        contentKey: contentKey,
+        onDone: (bytes) {
+          setState(() {
+            widget.onDone!(bytes);
+          });
+        },
+        onDoneButtonStyle: widget.onDoneButtonStyle,
+        editorBackgroundColor: widget.editorBackgroundColor,
+        actions: widget.actions,
+        title: widget.title,
+      ),
     );
   }
 

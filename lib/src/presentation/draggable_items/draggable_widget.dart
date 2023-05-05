@@ -40,16 +40,17 @@ class DraggableWidget extends StatelessWidget {
         Provider.of<GradientNotifier>(this.context, listen: false);
     final controlProvider =
         Provider.of<ControlNotifier>(this.context, listen: false);
-    Widget? overlayWidget;
+    Widget? contentWidget;
 
     BoxDecoration? decoration;
     if (isSelected) {
-      decoration = BoxDecoration(border: Border.all(color: Colors.white));
+      decoration =
+          BoxDecoration(border: Border.all(color: const Color(0xFFF2AC3C)));
     }
 
     switch (item.type) {
       case ItemType.text:
-        overlayWidget = IntrinsicWidth(
+        contentWidget = IntrinsicWidth(
           child: IntrinsicHeight(
             child: Container(
               constraints: BoxConstraints(
@@ -105,7 +106,7 @@ class DraggableWidget extends StatelessWidget {
       /// image [file_image_gb.dart]
       case ItemType.image:
         if (controlProvider.mediaPath.isNotEmpty) {
-          overlayWidget = SizedBox(
+          contentWidget = SizedBox(
             width: screenUtil.screenWidth - 144.w,
             child: FileImageBG(
               filePath: File(controlProvider.mediaPath),
@@ -117,13 +118,13 @@ class DraggableWidget extends StatelessWidget {
             ),
           );
         } else {
-          overlayWidget = Container();
+          contentWidget = Container();
         }
 
         break;
 
       case ItemType.gif:
-        overlayWidget = SizedBox(
+        contentWidget = SizedBox(
           width: 150,
           height: 150,
           child: Stack(
@@ -148,32 +149,85 @@ class DraggableWidget extends StatelessWidget {
         break;
 
       case ItemType.video:
-        overlayWidget = const Center();
+        contentWidget = const Center();
         break;
     }
 
     /// set widget data position on main screen
-    return AnimatedAlignPositioned(
-      duration: const Duration(milliseconds: 100),
-      dy: item.deletePosition
-          ? _deleteTopOffset()
-          : (item.position.dy * screenUtil.screenHeight),
-      dx: item.deletePosition ? 0 : (item.position.dx * screenUtil.screenWidth),
-      alignment: Alignment.center,
-      child: Transform.scale(
-        scale: item.deletePosition ? _deleteScale() : item.scale,
-        child: Transform.rotate(
-          angle: item.rotation,
-          child: Listener(
-            onPointerDown: onPointerDown,
-            onPointerUp: onPointerUp,
-            onPointerMove: onPointerMove,
+    return OverflowBox(
+      child: AnimatedAlignPositioned(
+        duration: const Duration(milliseconds: 100),
+        dy: item.deletePosition
+            ? _deleteTopOffset()
+            : (item.position.dy * screenUtil.screenHeight),
+        dx: item.deletePosition
+            ? 0
+            : (item.position.dx * screenUtil.screenWidth),
+        alignment: Alignment.center,
+        child: Transform.scale(
+          scale: item.deletePosition ? _deleteScale() : item.scale,
+          child: Transform.rotate(
+            angle: item.rotation,
+            child: Listener(
+              onPointerDown: onPointerDown,
+              onPointerUp: onPointerUp,
+              onPointerMove: onPointerMove,
 
-            /// show widget
-            child: overlayWidget,
+              /// show widget
+              child: buildEditingUserFrame(child: contentWidget),
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget buildEditingUserFrame({required Widget child}) {
+    final nowMilli = DateTime.now().toUtc().millisecondsSinceEpoch;
+    final startedAtMilli =
+        item.editingUser?.startedAt.millisecondsSinceEpoch ?? 0;
+    const showUserOffset = 1000;
+    final isOver = nowMilli - startedAtMilli > showUserOffset;
+
+    final showColor = isOver
+        ? Colors.transparent
+        : (item.editingUser?.backgroundColor ?? Colors.transparent);
+
+    final textColor =
+        isOver ? Colors.transparent : (Colors.black ?? Colors.transparent);
+
+    const radius = Radius.circular(2);
+    const nameHeight = 14.0;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          height: nameHeight,
+          padding: const EdgeInsets.symmetric(horizontal: 2),
+          decoration: BoxDecoration(
+            color: showColor,
+            borderRadius:
+                const BorderRadius.only(topLeft: radius, topRight: radius),
+          ),
+          child: Text(
+            item.editingUser?.username ?? '',
+            style: TextStyle(
+              color: textColor,
+              fontSize: 12,
+            ),
+          ),
+        ),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: showColor,
+            ),
+          ),
+          child: child,
+        ),
+        const SizedBox(height: nameHeight),
+      ],
     );
   }
 

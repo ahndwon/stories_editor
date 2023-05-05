@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:stories_editor/src/domain/converters/color_converter.dart';
+import 'package:stories_editor/src/domain/converters/datetime_converter.dart';
 import 'package:stories_editor/src/domain/converters/offset_converter.dart';
 import 'package:stories_editor/src/presentation/utils/constants/app_enums.dart';
 import 'package:uuid/uuid.dart';
@@ -33,6 +34,7 @@ class EditableItem implements Comparable<EditableItem> {
   @ColorConverter()
   Color backGroundColor = Colors.transparent;
   TextAnimationType animationType = TextAnimationType.none;
+  EditingUser? editingUser;
 
   /// Gif
   SimpleGiphyGif gif = SimpleGiphyGif(id: '0', url: '', stillUrl: '');
@@ -62,4 +64,26 @@ class SimpleGiphyGif {
       _$SimpleGiphyGifFromJson(value);
 
   Map<String, dynamic> toJson() => _$SimpleGiphyGifToJson(this);
+}
+
+@ColorConverter()
+@DateTimeConverter()
+@JsonSerializable()
+class EditingUser {
+  EditingUser({
+    required this.id,
+    required this.username,
+    required this.backgroundColor,
+    required this.startedAt,
+  });
+
+  final String id;
+  final String username;
+  final Color backgroundColor;
+  final DateTime startedAt;
+
+  static EditingUser fromJson(Map<String, dynamic> value) =>
+      _$EditingUserFromJson(value);
+
+  Map<String, dynamic> toJson() => _$EditingUserToJson(this);
 }

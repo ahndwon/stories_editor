@@ -26,6 +26,9 @@ EditableItem _$EditableItemFromJson(Map<String, dynamic> json) => EditableItem()
       const ColorConverter().fromJson(json['backGroundColor'] as int)
   ..animationType =
       $enumDecode(_$TextAnimationTypeEnumMap, json['animationType'])
+  ..editingUser = json['editingUser'] == null
+      ? null
+      : EditingUser.fromJson(json['editingUser'] as Map<String, dynamic>)
   ..gif = SimpleGiphyGif.fromJson(json['gif'] as Map<String, dynamic>);
 
 Map<String, dynamic> _$EditableItemToJson(EditableItem instance) =>
@@ -46,6 +49,7 @@ Map<String, dynamic> _$EditableItemToJson(EditableItem instance) =>
       'backGroundColor':
           const ColorConverter().toJson(instance.backGroundColor),
       'animationType': _$TextAnimationTypeEnumMap[instance.animationType]!,
+      'editingUser': instance.editingUser?.toJson(),
       'gif': instance.gif.toJson(),
     };
 
@@ -88,4 +92,22 @@ Map<String, dynamic> _$SimpleGiphyGifToJson(SimpleGiphyGif instance) =>
       'id': instance.id,
       'url': instance.url,
       'stillUrl': instance.stillUrl,
+    };
+
+EditingUser _$EditingUserFromJson(Map<String, dynamic> json) => EditingUser(
+      id: json['id'] as String,
+      username: json['username'] as String,
+      backgroundColor:
+          const ColorConverter().fromJson(json['backgroundColor'] as int),
+      startedAt:
+          const DateTimeConverter().fromJson(json['startedAt'] as String),
+    );
+
+Map<String, dynamic> _$EditingUserToJson(EditingUser instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'username': instance.username,
+      'backgroundColor':
+          const ColorConverter().toJson(instance.backgroundColor),
+      'startedAt': const DateTimeConverter().toJson(instance.startedAt),
     };
