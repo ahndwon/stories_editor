@@ -185,16 +185,15 @@ class DraggableWidget extends StatelessWidget {
   Widget buildEditingUserFrame({required Widget child}) {
     final nowMilli = DateTime.now().toUtc().millisecondsSinceEpoch;
     final startedAtMilli =
-        item.editingUser?.startedAt.millisecondsSinceEpoch ?? 0;
-    const showUserOffset = 1000;
+        item.editingUser?.receivedAt?.millisecondsSinceEpoch ?? 0;
+    const showUserOffset = 500;
     final isOver = nowMilli - startedAtMilli > showUserOffset;
 
     final showColor = isOver
         ? Colors.transparent
         : (item.editingUser?.backgroundColor ?? Colors.transparent);
 
-    final textColor =
-        isOver ? Colors.transparent : (Colors.black ?? Colors.transparent);
+    final textColor = isOver ? Colors.transparent : Colors.black;
 
     const radius = Radius.circular(2);
     const nameHeight = 14.0;
