@@ -183,7 +183,7 @@ class DraggableWidget extends StatelessWidget {
   }
 
   Widget buildEditingUserFrame({required Widget child}) {
-    final nowMilli = DateTime.now().toUtc().millisecondsSinceEpoch;
+    final nowMilli = DateTime.now().millisecondsSinceEpoch;
     final startedAtMilli =
         item.editingUser?.receivedAt?.millisecondsSinceEpoch ?? 0;
     const showUserOffset = 500;
