@@ -154,7 +154,7 @@ class DraggableWidget extends StatelessWidget {
 
     /// set widget data position on main screen
     return AnimatedAlignPositioned(
-      duration: const Duration(milliseconds: 50),
+      duration: const Duration(milliseconds: 100),
       dy: item.deletePosition
           ? _deleteTopOffset()
           : (item.position.dy * screenUtil.screenHeight),

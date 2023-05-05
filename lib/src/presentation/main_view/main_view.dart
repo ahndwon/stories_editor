@@ -123,6 +123,8 @@ class MainViewState extends State<MainView> {
 
   Map<String, GlobalKey> draggableKeys = {};
 
+  bool _isInitialValue = false;
+
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -249,23 +251,26 @@ class MainViewState extends State<MainView> {
                       child: RepaintBoundary(
                         key: contentKey,
                         child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
+                          duration: const Duration(milliseconds: 2000),
+                          curve: Curves.easeIn,
                           decoration: BoxDecoration(
-                            gradient: controlNotifier.mediaPath.isEmpty
-                                ? LinearGradient(
-                                    colors: controlNotifier.gradientColors![
-                                        controlNotifier.gradientIndex],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  )
-                                : LinearGradient(
-                                    colors: [
-                                      colorProvider.color1,
-                                      colorProvider.color2
-                                    ],
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                  ),
+                            color: _isInitialValue ? Colors.blue : Colors.red,
+
+                            // gradient: controlNotifier.mediaPath.isEmpty
+                            //     ? LinearGradient(
+                            //         colors: controlNotifier.gradientColors![
+                            //             controlNotifier.gradientIndex],
+                            //         begin: Alignment.topLeft,
+                            //         end: Alignment.bottomRight,
+                            //       )
+                            //     : LinearGradient(
+                            //         colors: [
+                            //           colorProvider.color1,
+                            //           colorProvider.color2
+                            //         ],
+                            //         begin: Alignment.topCenter,
+                            //         end: Alignment.bottomCenter,
+                            //       ),
                           ),
                           child: GestureDetector(
                             onScaleStart: _onScaleStart,
@@ -295,7 +300,7 @@ class MainViewState extends State<MainView> {
                                     .getDistinctDraggableWidget()
                                     .toList()
                                     .map((editableItem) {
-                                  return DraggableWidget(
+                                  final draggable = DraggableWidget(
                                     key: _getOrAddKey(editableItem),
                                     context: context,
                                     item: editableItem,
@@ -320,6 +325,12 @@ class MainViewState extends State<MainView> {
                                       );
                                     },
                                   );
+                                  return AnimatedPositioned(
+                                    duration:
+                                        const Duration(milliseconds: 4000),
+                                    curve: Curves.easeIn,
+                                    child: draggable,
+                                  );
                                 }),
 
                                 /// finger paint
@@ -329,6 +340,20 @@ class MainViewState extends State<MainView> {
                                     child: buildFingerPaint(
                                       screenUtil,
                                       paintingProvider,
+                                    ),
+                                  ),
+                                ),
+                                Align(
+                                  alignment: Alignment.bottomCenter,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(bottom: 100),
+                                    child: OutlinedButton(
+                                      child: const Text('Change value'),
+                                      onPressed: () {
+                                        setState(() {
+                                          _isInitialValue = !_isInitialValue;
+                                        });
+                                      },
                                     ),
                                   ),
                                 ),
