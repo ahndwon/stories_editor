@@ -177,37 +177,13 @@ class MainViewState extends State<MainView> {
             editingProvider,
             child,
           ) {
-            return SafeArea(
-              top: false,
-              child: buildMainView(
-                controlNotifier,
-                screenUtil,
-                colorProvider,
-                itemProvider,
-                context,
-                paintingProvider,
-              ),
-              // child: ScrollablePageView(
-              //   scrollPhysics: controlNotifier.mediaPath.isEmpty &&
-              //       itemProvider.draggableWidget.isEmpty &&
-              //       !controlNotifier.isPainting &&
-              //       !controlNotifier.isTextEditing,
-              //   pageController: scrollProvider.pageController,
-              //   gridController: scrollProvider.gridController,
-              //   mainView: buildMainView(
-              //     controlNotifier,
-              //     screenUtil,
-              //     colorProvider,
-              //     itemProvider,
-              //     context,
-              //     paintingProvider,
-              //   ),
-              //   gallery: buildGalleryMediaPicker(
-              //     scrollProvider,
-              //     itemProvider,
-              //     controlNotifier,
-              //   ),
-              // ),
+            return buildMainView(
+              controlNotifier,
+              screenUtil,
+              colorProvider,
+              itemProvider,
+              context,
+              paintingProvider,
             );
           },
         ),
@@ -482,20 +458,17 @@ class MainViewState extends State<MainView> {
   }
 
   Widget buildTopToolBar() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 24),
-      child: TopToolBar(
-        contentKey: contentKey,
-        onDone: (bytes) {
-          setState(() {
-            widget.onDone!(bytes);
-          });
-        },
-        onDoneButtonStyle: widget.onDoneButtonStyle,
-        editorBackgroundColor: widget.editorBackgroundColor,
-        actions: widget.actions,
-        title: widget.title,
-      ),
+    return TopToolBar(
+      contentKey: contentKey,
+      onDone: (bytes) {
+        setState(() {
+          widget.onDone!(bytes);
+        });
+      },
+      onDoneButtonStyle: widget.onDoneButtonStyle,
+      editorBackgroundColor: widget.editorBackgroundColor,
+      actions: widget.actions,
+      title: widget.title,
     );
   }
 
