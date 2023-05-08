@@ -47,6 +47,9 @@ class EditableItem implements Comparable<EditableItem> {
 
   @override
   int compareTo(EditableItem other) => other.id.compareTo(id);
+
+  @override
+  String toString() => toJson().toString();
 }
 
 @JsonSerializable()

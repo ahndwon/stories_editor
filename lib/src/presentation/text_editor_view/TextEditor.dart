@@ -161,7 +161,8 @@ class _TextEditorState extends State<TextEditor> {
       }
 
       /// create Text Item
-      editableItemNotifier.draggableWidget.add(
+      editableItemNotifier.insert(
+        index: editableItemNotifier.draggableWidget.length,
         EditableItem()
           ..type = ItemType.text
           ..text = editorNotifier.text.trim()
