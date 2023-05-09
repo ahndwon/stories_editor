@@ -113,4 +113,6 @@ class ControlNotifier extends ChangeNotifier {
     _isPhotoFilter = filter;
     notifyListeners();
   }
+
+  List<Color>? currentGradient() => _gradientColors?[_gradientIndex];
 }
