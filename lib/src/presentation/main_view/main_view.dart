@@ -230,23 +230,23 @@ class MainViewState extends State<MainView> {
                           duration: const Duration(milliseconds: 2000),
                           curve: Curves.easeIn,
                           decoration: BoxDecoration(
-                            color: _isInitialValue ? Colors.blue : Colors.red,
+                          //   color: _isInitialValue ? Colors.blue : Colors.red,
 
-                            // gradient: controlNotifier.mediaPath.isEmpty
-                            //     ? LinearGradient(
-                            //         colors: controlNotifier.gradientColors![
-                            //             controlNotifier.gradientIndex],
-                            //         begin: Alignment.topLeft,
-                            //         end: Alignment.bottomRight,
-                            //       )
-                            //     : LinearGradient(
-                            //         colors: [
-                            //           colorProvider.color1,
-                            //           colorProvider.color2
-                            //         ],
-                            //         begin: Alignment.topCenter,
-                            //         end: Alignment.bottomCenter,
-                            //       ),
+                            gradient: controlNotifier.mediaPath.isEmpty
+                                ? LinearGradient(
+                              colors: controlNotifier.gradientColors![
+                              controlNotifier.gradientIndex],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            )
+                                : LinearGradient(
+                              colors: [
+                                colorProvider.color1,
+                                colorProvider.color2
+                              ],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                            ),
                           ),
                           child: GestureDetector(
                             onScaleStart: _onScaleStart,
@@ -319,20 +319,20 @@ class MainViewState extends State<MainView> {
                                     ),
                                   ),
                                 ),
-                                Align(
-                                  alignment: Alignment.bottomCenter,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(bottom: 100),
-                                    child: OutlinedButton(
-                                      child: const Text('Change value'),
-                                      onPressed: () {
-                                        setState(() {
-                                          _isInitialValue = !_isInitialValue;
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                ),
+                                // Align(
+                                //   alignment: Alignment.bottomCenter,
+                                //   child: Padding(
+                                //     padding: const EdgeInsets.only(bottom: 100),
+                                //     child: OutlinedButton(
+                                //       child: const Text('Change value'),
+                                //       onPressed: () {
+                                //         setState(() {
+                                //           _isInitialValue = !_isInitialValue;
+                                //         });
+                                //       },
+                                //     ),
+                                //   ),
+                                // ),
                               ],
                             ),
                           ),
@@ -610,6 +610,14 @@ class MainViewState extends State<MainView> {
         _isDeletePosition = true;
         item.deletePosition = true;
       });
+    } else if (item.type == ItemType.image &&
+        item.position.dy >= 0.62.h &&
+        item.position.dx >= -0.35.w &&
+        item.position.dx <= 0.15) {
+      setState(() {
+        _isDeletePosition = true;
+        item.deletePosition = true;
+      });
     } else {
       setState(() {
         _isDeletePosition = false;
@@ -623,7 +631,15 @@ class MainViewState extends State<MainView> {
     final itemProvider =
         Provider.of<DraggableWidgetNotifier>(context, listen: false);
     _inAction = false;
-    if (item.type == ItemType.image) {
+    if (item.type == ItemType.image &&
+        item.position.dy >= 0.62.h &&
+        item.position.dx >= -0.35.w &&
+        item.position.dx <= 0.15) {
+      setState(() {
+        itemProvider.remove(item.id);
+        widget.onRemoveDraggable?.call(item.id);
+        HapticFeedback.heavyImpact();
+      });
     } else if (item.type == ItemType.text &&
             item.position.dy >= 0.75.h &&
             item.position.dx >= -0.4.w &&
@@ -653,6 +669,7 @@ class MainViewState extends State<MainView> {
     if (_inAction) {
       return;
     }
+    print('_updateItemPosition : $item');
 
     _inAction = true;
     _activeItem = item;

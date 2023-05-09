@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:gallery_media_picker/gallery_media_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:stories_editor/src/domain/providers/notifiers/control_provider.dart';
-import 'package:stories_editor/src/domain/providers/notifiers/draggable_widget_notifier.dart';
-import 'package:stories_editor/src/domain/providers/notifiers/painting_notifier.dart';
 import 'package:stories_editor/src/domain/sevices/save_as_image.dart';
 import 'package:stories_editor/src/presentation/utils/modal_sheets.dart';
 import 'package:stories_editor/src/presentation/widgets/animated_onTap_button.dart';
 import 'package:stories_editor/src/presentation/widgets/tool_button.dart';
+import 'package:stories_editor/stories_editor.dart';
 
 class MainTools extends StatefulWidget {
   const MainTools({super.key, required this.contentKey, required this.context});
@@ -146,6 +145,28 @@ class MainToolsState extends State<MainTools> {
                   size: 20,
                 ),
               ),
+              ToolButton(
+                backGroundColor: Colors.black12,
+                onTap: () async {
+                  await showModalBottomSheet<void>(
+                    context: context,
+                    builder: (context) {
+                      return buildGalleryMediaPicker(
+                        itemNotifier,
+                        controlNotifier,
+                      );
+                    },
+                  );
+                },
+                child: const ImageIcon(
+                  AssetImage(
+                    'assets/icons/photo_filter.png',
+                    package: 'stories_editor',
+                  ),
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
             ],
           ),
           // child: Row(
@@ -268,6 +289,61 @@ class MainToolsState extends State<MainTools> {
           // ),
         );
       },
+    );
+  }
+
+  GalleryMediaPicker buildGalleryMediaPicker(
+    DraggableWidgetNotifier itemProvider,
+    ControlNotifier controlNotifier,
+  ) {
+    return GalleryMediaPicker(
+      gridViewController: ScrollController(),
+      thumbnailQuality: 300,
+      onlyImages: true,
+      appBarColor: Colors.black,
+      gridViewPhysics: itemProvider.draggableWidget.isEmpty
+          ? const NeverScrollableScrollPhysics()
+          : const ScrollPhysics(),
+      pathList: (path) {
+        controlNotifier.mediaPath = path.first.path!;
+        if (controlNotifier.mediaPath.isNotEmpty) {
+          itemProvider.insert(
+            EditableItem()
+              ..imageUrl = path.first.path!
+              ..type = ItemType.image
+              ..position = Offset.zero,
+          );
+        }
+        Navigator.of(context).pop();
+      },
+      appBarLeadingWidget: Padding(
+        padding: const EdgeInsets.only(bottom: 15, right: 15),
+        child: Align(
+          alignment: Alignment.bottomRight,
+          child: AnimatedOnTapButton(
+            onTap: () {},
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: Colors.white,
+                  width: 1.2,
+                ),
+              ),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 

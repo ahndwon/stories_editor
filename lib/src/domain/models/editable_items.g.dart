@@ -102,6 +102,7 @@ EditableItem _$EditableItemFromJson(Map<String, dynamic> json) => EditableItem()
   ..scale = (json['scale'] as num).toDouble()
   ..rotation = (json['rotation'] as num).toDouble()
   ..type = $enumDecode(_$ItemTypeEnumMap, json['type'])
+  ..imageUrl = json['imageUrl'] as String?
   ..text = json['text'] as String
   ..textList =
       (json['textList'] as List<dynamic>).map((e) => e as String).toList()
@@ -127,6 +128,7 @@ Map<String, dynamic> _$EditableItemToJson(EditableItem instance) =>
       'scale': instance.scale,
       'rotation': instance.rotation,
       'type': _$ItemTypeEnumMap[instance.type]!,
+      'imageUrl': instance.imageUrl,
       'text': instance.text,
       'textList': instance.textList,
       'textColor': const ColorConverter().toJson(instance.textColor),

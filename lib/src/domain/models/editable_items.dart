@@ -23,6 +23,9 @@ class EditableItem implements Comparable<EditableItem> {
   double rotation = 0;
   ItemType type = ItemType.text;
 
+  /// image
+  String? imageUrl = '';
+
   /// text
   String text = '';
   List<String> textList = [];

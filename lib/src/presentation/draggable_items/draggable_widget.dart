@@ -13,7 +13,6 @@ import 'package:stories_editor/src/domain/providers/notifiers/gradient_notifier.
 import 'package:stories_editor/src/domain/providers/notifiers/text_editing_notifier.dart';
 import 'package:stories_editor/src/presentation/utils/constants/app_enums.dart';
 import 'package:stories_editor/src/presentation/widgets/animated_onTap_button.dart';
-import 'package:stories_editor/src/presentation/widgets/file_image_bg.dart';
 
 class DraggableWidget extends StatelessWidget {
   const DraggableWidget({
@@ -44,8 +43,12 @@ class DraggableWidget extends StatelessWidget {
 
     BoxDecoration? decoration;
     if (isSelected) {
-      decoration =
-          BoxDecoration(border: Border.all(color: const Color(0xFFF2AC3C)));
+      decoration = BoxDecoration(
+        border: Border.all(
+          color: const Color(0xFFF2AC3C),
+          strokeAlign: BorderSide.strokeAlignOutside,
+        ),
+      );
     }
 
     switch (item.type) {
@@ -105,21 +108,42 @@ class DraggableWidget extends StatelessWidget {
 
       /// image [file_image_gb.dart]
       case ItemType.image:
-        if (controlProvider.mediaPath.isNotEmpty) {
-          contentWidget = SizedBox(
-            width: screenUtil.screenWidth - 144.w,
-            child: FileImageBG(
-              filePath: File(controlProvider.mediaPath),
-              generatedGradient: (color1, color2) {
-                colorProvider
-                  ..color1 = color1
-                  ..color2 = color2;
-              },
-            ),
+        final imageUrl = item.imageUrl;
+        final imageWidth = screenUtil.screenWidth - 200.w;
+
+        if (imageUrl != null && imageUrl.isNotEmpty) {
+          Widget? imageWidget = const SizedBox();
+          if (imageUrl.startsWith('http') || imageUrl.startsWith('https')) {
+            // final screenSize = MediaQuery.of(context).size;
+            imageWidget = Image.network(
+              imageUrl,
+              width: imageWidth,
+            );
+          } else {
+            imageWidget = Image.file(File(imageUrl), width: imageWidth);
+          }
+          contentWidget = Container(
+            decoration: decoration,
+            child: imageWidget,
           );
         } else {
           contentWidget = Container();
         }
+        // if (controlProvider.mediaPath.isNotEmpty) {
+        //   contentWidget = SizedBox(
+        //     width: screenUtil.screenWidth - 144.w,
+        //     child: FileImageBG(
+        //       filePath: File(controlProvider.mediaPath),
+        //       generatedGradient: (color1, color2) {
+        //         colorProvider
+        //           ..color1 = color1
+        //           ..color2 = color2;
+        //       },
+        //     ),
+        //   );
+        // } else {
+        //   contentWidget = Container();
+        // }
 
         break;
 
@@ -208,6 +232,10 @@ class DraggableWidget extends StatelessWidget {
             color: showColor,
             borderRadius:
                 const BorderRadius.only(topLeft: radius, topRight: radius),
+            border: Border.all(
+              color: showColor,
+              strokeAlign: BorderSide.strokeAlignOutside,
+            ),
           ),
           child: Text(
             item.editingUser?.username ?? '',
@@ -221,6 +249,7 @@ class DraggableWidget extends StatelessWidget {
           decoration: BoxDecoration(
             border: Border.all(
               color: showColor,
+              strokeAlign: BorderSide.strokeAlignOutside,
             ),
           ),
           child: child,
