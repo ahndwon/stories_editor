@@ -19,15 +19,20 @@ class DraggableWidgetNotifier extends ChangeNotifier {
 
   GiphyGif? get giphy => _gif;
 
-  void Function(EditableItem item)? onMoveFinish;
-
   // set giphy(GiphyGif? giphy) {
   //   _gif = giphy;
   //   notifyListeners();
   // }
 
   void insert(EditableItem item, {int index = 0, bool silent = false}) {
-    _draggableWidget.insert(index, item);
+    if (_draggableWidget.where((d) => d.id == item.id).isNotEmpty) {
+      return;
+    }
+    if (_draggableWidget.isEmpty) {
+      _draggableWidget = [item];
+    } else {
+      _draggableWidget.insert(index, item);
+    }
     if (!silent) {
       onAddDraggable?.call(item);
     }

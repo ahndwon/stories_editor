@@ -45,10 +45,13 @@ class StoriesEditor extends StatefulWidget {
     this.textEditingController,
     this.onAddDraggable,
     this.onMoveDraggable,
+    this.onMoveEndDraggable,
     this.onRemoveDraggable,
     this.onChatButtonClick,
     this.actions,
     this.title,
+    this.onUndo,
+    this.onRedo,
   });
 
   /// editor custom font families
@@ -90,6 +93,12 @@ class StoriesEditor extends StatefulWidget {
   // widget for title
   final Widget? title;
 
+  // undo button click callback
+  final void Function()? onUndo;
+
+  // redo button click callback
+  final void Function()? onRedo;
+
   final ControlNotifier? controlController;
   final ScrollNotifier? scrollController;
   final DraggableWidgetNotifier? draggableWidgetController;
@@ -98,6 +107,7 @@ class StoriesEditor extends StatefulWidget {
   final TextEditingNotifier? textEditingController;
   final void Function(EditableItem)? onAddDraggable;
   final void Function(EditableItem)? onMoveDraggable;
+  final void Function(EditableItem)? onMoveEndDraggable;
   final void Function(String)? onRemoveDraggable;
   final void Function()? onChatButtonClick;
 
@@ -180,10 +190,13 @@ class StoriesEditorState extends State<StoriesEditor> {
             editorBackgroundColor: widget.editorBackgroundColor,
             galleryThumbnailQuality: widget.galleryThumbnailQuality,
             onMoveDraggable: widget.onMoveDraggable,
+            onMoveEndDraggable: widget.onMoveEndDraggable,
             onRemoveDraggable: widget.onRemoveDraggable,
             onChatButtonClick: widget.onChatButtonClick,
             actions: widget.actions,
             title: widget.title,
+            onUndo: widget.onUndo,
+            onRedo: widget.onRedo,
           ),
         ),
       ),

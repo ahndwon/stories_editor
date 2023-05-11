@@ -42,10 +42,13 @@ class MainView extends StatefulWidget {
     this.editorBackgroundColor,
     this.galleryThumbnailQuality,
     this.onMoveDraggable,
+    this.onMoveEndDraggable,
     this.onRemoveDraggable,
     this.onChatButtonClick,
     this.title,
     this.actions,
+    this.onUndo,
+    this.onRedo,
   });
 
   /// editor custom font families
@@ -91,11 +94,20 @@ class MainView extends StatefulWidget {
   // on move item
   final void Function(EditableItem)? onMoveDraggable;
 
+  // on move end item
+  final void Function(EditableItem)? onMoveEndDraggable;
+
   // item remove callback
   final void Function(String)? onRemoveDraggable;
 
   // chat button click callback
   final void Function()? onChatButtonClick;
+
+  // undo button click callback
+  final void Function()? onUndo;
+
+  // redo button click callback
+  final void Function()? onRedo;
 
   // top tool bar actions
   final List<Widget>? actions;
@@ -227,26 +239,26 @@ class MainViewState extends State<MainView> {
                       child: RepaintBoundary(
                         key: contentKey,
                         child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 2000),
+                          duration: const Duration(milliseconds: 1000),
                           curve: Curves.easeIn,
                           decoration: BoxDecoration(
-                          //   color: _isInitialValue ? Colors.blue : Colors.red,
+                            //   color: _isInitialValue ? Colors.blue : Colors.red,
 
                             gradient: controlNotifier.mediaPath.isEmpty
                                 ? LinearGradient(
-                              colors: controlNotifier.gradientColors![
-                              controlNotifier.gradientIndex],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            )
+                                    colors: controlNotifier.gradientColors![
+                                        controlNotifier.gradientIndex],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  )
                                 : LinearGradient(
-                              colors: [
-                                colorProvider.color1,
-                                colorProvider.color2
-                              ],
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                            ),
+                                    colors: [
+                                      colorProvider.color1,
+                                      colorProvider.color2
+                                    ],
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                  ),
                           ),
                           child: GestureDetector(
                             onScaleStart: _onScaleStart,
@@ -293,12 +305,16 @@ class MainViewState extends State<MainView> {
                                         editableItem,
                                         details,
                                       );
+                                      widget.onMoveEndDraggable
+                                          ?.call(editableItem);
                                     },
                                     onPointerMove: (details) {
                                       _deletePosition(
                                         editableItem,
                                         details,
                                       );
+                                      widget.onMoveDraggable
+                                          ?.call(editableItem);
                                     },
                                   );
                                   return AnimatedPositioned(
@@ -593,7 +609,6 @@ class MainViewState extends State<MainView> {
 
   /// active delete widget with offset position
   void _deletePosition(EditableItem item, PointerMoveEvent details) {
-    widget.onMoveDraggable?.call(item);
     if (item.type == ItemType.text &&
         item.position.dy >= 0.75.h &&
         item.position.dx >= -0.4.w &&
@@ -654,7 +669,6 @@ class MainViewState extends State<MainView> {
         HapticFeedback.heavyImpact();
       });
     } else {
-      itemProvider.onMoveFinish?.call(item);
       setState(() {
         _activeItem = null;
       });
@@ -686,20 +700,22 @@ class MainViewState extends State<MainView> {
     return Row(
       children: [
         IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.navigate_before_rounded,
-            color: Colors.white,
+            color: widget.onUndo == null ? Colors.grey : Colors.white,
             size: 32,
           ),
-          onPressed: () {},
+          enableFeedback: true,
+          onPressed: widget.onUndo == null ? null : () => widget.onUndo?.call(),
         ),
         IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.navigate_next_rounded,
-            color: Colors.white,
+            color: widget.onRedo == null ? Colors.grey : Colors.white,
             size: 32,
           ),
-          onPressed: () {},
+          enableFeedback: true,
+          onPressed: widget.onRedo == null ? null : () => widget.onRedo?.call(),
         ),
         const Expanded(child: SizedBox()),
         IconButton(
