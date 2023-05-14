@@ -160,11 +160,26 @@ class DraggableWidget extends StatelessWidget {
                   alignment: Alignment.center,
                   padding: const EdgeInsets.all(8),
                   decoration: isSelected ? decoration : const BoxDecoration(),
-                  child: GiphyRenderImage(
+                  child: Image.network(
                     key: ValueKey(item.gif.id),
-                    url: item.gif.url,
-                    renderGiphyOverlay: false,
+                    item.gif.url,
+                    loadingBuilder: (
+                      context,
+                      child,
+                      loadingProgress,
+                    ) {
+                      if (loadingProgress?.cumulativeBytesLoaded !=
+                          loadingProgress?.cumulativeBytesLoaded) {
+                        return const CircularProgressIndicator();
+                      }
+                      return child;
+                    },
                   ),
+                  // child: GiphyRenderImage(
+                  //   key: ValueKey(item.gif.id),
+                  //   url: item.gif.stillUrl,
+                  //   renderGiphyOverlay: false,
+                  // ),
                 ),
               ),
             ],
