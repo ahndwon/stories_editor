@@ -1,10 +1,10 @@
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:align_positioned/align_positioned.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:modal_gif_picker/modal_gif_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:stories_editor/src/domain/models/editable_items.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/control_provider.dart';
@@ -15,22 +15,33 @@ import 'package:stories_editor/src/presentation/utils/constants/app_enums.dart';
 import 'package:stories_editor/src/presentation/widgets/animated_onTap_button.dart';
 
 class DraggableWidget extends StatelessWidget {
-  const DraggableWidget({
+  DraggableWidget({
     super.key,
     required this.context,
     required this.item,
     this.onPointerDown,
     this.onPointerUp,
     this.onPointerMove,
+    this.onDeleteTap,
+    this.onScaleStart,
+    this.onScaleMove,
+    this.onFlipTap,
     this.isSelected = false,
+    this.frame,
   });
 
   final EditableItem item;
   final void Function(PointerDownEvent)? onPointerDown;
   final void Function(PointerUpEvent)? onPointerUp;
   final void Function(PointerMoveEvent)? onPointerMove;
+  final void Function(EditableItem)? onDeleteTap;
+  final void Function(PointerDownEvent)? onScaleStart;
+  final void Function(PointerMoveEvent)? onScaleMove;
+  final void Function(EditableItem)? onFlipTap;
   final BuildContext context;
   final bool isSelected;
+
+  Widget? frame;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +51,6 @@ class DraggableWidget extends StatelessWidget {
     final controlProvider =
         Provider.of<ControlNotifier>(this.context, listen: false);
     Widget? contentWidget;
-
     BoxDecoration? decoration;
     if (isSelected) {
       decoration = BoxDecoration(
@@ -213,11 +223,118 @@ class DraggableWidget extends StatelessWidget {
               onPointerMove: onPointerMove,
 
               /// show widget
-              child: buildEditingUserFrame(child: contentWidget),
+              child: buildEditFrame(
+                isShow: isSelected,
+                child: buildEditingUserFrame(
+                  child: Transform(
+                    alignment: Alignment.center,
+                    transform: item.isFlip
+                        ? Matrix4.rotationY(math.pi)
+                        : Matrix4.identity(),
+                    child: contentWidget,
+                  ),
+                ),
+              ),
+              // child: isSelected
+              //     ? buildEditFrame(child: contentWidget)
+              //     : buildEditingUserFrame(child: contentWidget),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget buildEditFrame({required Widget child, required bool isShow}) {
+    return Stack(
+      children: [
+        // DecoratedBox(
+        //   decoration: BoxDecoration(
+        //     border: Border.all(
+        //       color: const Color(0xFFF2AC3C),
+        //       strokeAlign: BorderSide.strokeAlignOutside,
+        //     ),
+        //   ),
+        //   child: child,
+        // ),
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: 10,
+            horizontal: 24,
+          ),
+          child: child,
+        ),
+        Visibility(
+          visible: isShow,
+          child: Positioned(
+            left: 0,
+            top: 0,
+            child: IconButton(
+              onPressed: () {
+                onDeleteTap?.call(item);
+              },
+              icon: const DecoratedBox(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                ),
+                child: Icon(
+                  Icons.close,
+                  size: 16,
+                ),
+              ),
+            ),
+          ),
+        ),
+        Visibility(
+          visible: isShow,
+          child: Positioned(
+            right: 0,
+            top: 0,
+            child: Listener(
+              onPointerDown: (details) {
+                onScaleStart?.call(details);
+              },
+              onPointerMove: (details) {
+                onScaleMove?.call(details);
+              },
+              child: const DecoratedBox(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                ),
+                child: Icon(
+                  Icons.rotate_left,
+                  size: 32,
+                ),
+              ),
+            ),
+          ),
+        ),
+        Visibility(
+          visible: isShow,
+          child: Positioned(
+            bottom: 0,
+            right: 0,
+            child: IconButton(
+              onPressed: () {
+                item.isFlip = !item.isFlip;
+                onFlipTap?.call(item);
+              },
+              icon: const DecoratedBox(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                ),
+                child: Icon(
+                  Icons.flip,
+                  size: 16,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

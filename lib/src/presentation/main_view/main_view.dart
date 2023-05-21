@@ -135,8 +135,6 @@ class MainViewState extends State<MainView> {
 
   Map<String, GlobalKey> draggableKeys = {};
 
-  bool _isInitialValue = false;
-
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -227,8 +225,11 @@ class MainViewState extends State<MainView> {
                 onScaleStart: _onScaleStart,
                 onScaleUpdate: _onScaleUpdate,
                 onTap: () {
-                  controlNotifier.isTextEditing =
-                      !controlNotifier.isTextEditing;
+                  // controlNotifier.isTextEditing =
+                  //     !controlNotifier.isTextEditing;
+                  setState(() {
+                    _activeItem = null;
+                  });
                 },
                 child: Align(
                   // alignment: Alignment.topCenter,
@@ -294,6 +295,17 @@ class MainViewState extends State<MainView> {
                                     item: editableItem,
                                     isSelected:
                                         editableItem.id == _activeItem?.id,
+                                    onDeleteTap: (item) {
+                                      setState(() {
+                                        itemProvider.remove(item.id);
+                                        widget.onRemoveDraggable?.call(item.id);
+                                        HapticFeedback.heavyImpact();
+                                      });
+                                    },
+                                    onFlipTap: (item) {
+                                      setState(() {});
+                                      widget.onMoveEndDraggable?.call(item);
+                                    },
                                     onPointerDown: (details) {
                                       _updateItemPosition(
                                         editableItem,
@@ -668,14 +680,7 @@ class MainViewState extends State<MainView> {
         widget.onRemoveDraggable?.call(item.id);
         HapticFeedback.heavyImpact();
       });
-    } else {
-      setState(() {
-        _activeItem = null;
-      });
     }
-    setState(() {
-      _activeItem = null;
-    });
   }
 
   /// update item position, scale, rotation

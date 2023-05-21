@@ -118,6 +118,7 @@ EditableItem _$EditableItemFromJson(Map<String, dynamic> json) => EditableItem()
   ..editingUser = json['editingUser'] == null
       ? null
       : EditingUser.fromJson(json['editingUser'] as Map<String, dynamic>)
+  ..isFlip = json['isFlip'] as bool? ?? false
   ..gif = SimpleGiphyGif.fromJson(json['gif'] as Map<String, dynamic>);
 
 Map<String, dynamic> _$EditableItemToJson(EditableItem instance) =>
@@ -140,6 +141,7 @@ Map<String, dynamic> _$EditableItemToJson(EditableItem instance) =>
           const ColorConverter().toJson(instance.backGroundColor),
       'animationType': _$TextAnimationTypeEnumMap[instance.animationType]!,
       'editingUser': instance.editingUser?.toJson(),
+      'isFlip': instance.isFlip,
       'gif': instance.gif.toJson(),
     };
 

@@ -39,6 +39,7 @@ class EditableItem implements Comparable<EditableItem> {
   Color backGroundColor = Colors.transparent;
   TextAnimationType animationType = TextAnimationType.none;
   EditingUser? editingUser;
+  bool isFlip = false;
 
   /// Gif
   SimpleGiphyGif gif = SimpleGiphyGif(id: '0', url: '', stillUrl: '');
@@ -76,7 +77,7 @@ class SimpleGiphyGif {
 @CopyWith()
 @ColorConverter()
 @DateTimeConverter()
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class EditingUser {
   EditingUser({
     required this.id,
