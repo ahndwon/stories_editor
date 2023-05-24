@@ -96,6 +96,9 @@ extension $EditingUserCopyWith on EditingUser {
 
 EditableItem _$EditableItemFromJson(Map<String, dynamic> json) => EditableItem()
   ..id = json['id'] as String
+  ..size = json['size'] == null
+      ? const Size(200, 200)
+      : const SizeConverter().fromJson(json['size'] as Map<String, dynamic>)
   ..deletePosition = json['deletePosition'] as bool
   ..position =
       const OffsetConverter().fromJson(json['position'] as Map<String, dynamic>)
@@ -118,12 +121,13 @@ EditableItem _$EditableItemFromJson(Map<String, dynamic> json) => EditableItem()
   ..editingUser = json['editingUser'] == null
       ? null
       : EditingUser.fromJson(json['editingUser'] as Map<String, dynamic>)
-  ..isFlip = json['isFlip'] as bool? ?? false
+  ..isFlip = ((json['isFlip'] as bool?) ?? false)
   ..gif = SimpleGiphyGif.fromJson(json['gif'] as Map<String, dynamic>);
 
 Map<String, dynamic> _$EditableItemToJson(EditableItem instance) =>
     <String, dynamic>{
       'id': instance.id,
+      'size': const SizeConverter().toJson(instance.size),
       'deletePosition': instance.deletePosition,
       'position': const OffsetConverter().toJson(instance.position),
       'scale': instance.scale,

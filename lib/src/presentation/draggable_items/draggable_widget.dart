@@ -12,10 +12,11 @@ import 'package:stories_editor/src/domain/providers/notifiers/draggable_widget_n
 import 'package:stories_editor/src/domain/providers/notifiers/gradient_notifier.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/text_editing_notifier.dart';
 import 'package:stories_editor/src/presentation/utils/constants/app_enums.dart';
+import 'package:stories_editor/src/presentation/utils/screen_util_helper.dart';
 import 'package:stories_editor/src/presentation/widgets/animated_onTap_button.dart';
 
 class DraggableWidget extends StatelessWidget {
-  DraggableWidget({
+  const DraggableWidget({
     super.key,
     required this.context,
     required this.item,
@@ -40,8 +41,7 @@ class DraggableWidget extends StatelessWidget {
   final void Function(EditableItem)? onFlipTap;
   final BuildContext context;
   final bool isSelected;
-
-  Widget? frame;
+  final Widget? frame;
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +55,7 @@ class DraggableWidget extends StatelessWidget {
     if (isSelected) {
       decoration = BoxDecoration(
         border: Border.all(
+          width: 2,
           color: const Color(0xFFF2AC3C),
           strokeAlign: BorderSide.strokeAlignOutside,
         ),
@@ -208,36 +209,34 @@ class DraggableWidget extends StatelessWidget {
         duration: const Duration(milliseconds: 100),
         dy: item.deletePosition
             ? _deleteTopOffset()
-            : (item.position.dy * screenUtil.screenHeight),
+            : screenUtil.denormalizeByWidth(item.position.dy),
         dx: item.deletePosition
             ? 0
-            : (item.position.dx * screenUtil.screenWidth),
+            : screenUtil.denormalizeByWidth(item.position.dx),
         alignment: Alignment.center,
-        child: Transform.scale(
-          scale: item.deletePosition ? _deleteScale() : item.scale,
-          child: Transform.rotate(
-            angle: item.rotation,
-            child: Listener(
-              onPointerDown: onPointerDown,
-              onPointerUp: onPointerUp,
-              onPointerMove: onPointerMove,
+        child: Transform.rotate(
+          angle: item.rotation,
+          child: Listener(
+            onPointerDown: onPointerDown,
+            onPointerUp: onPointerUp,
+            onPointerMove: onPointerMove,
 
-              /// show widget
-              child: buildEditFrame(
-                isShow: isSelected,
-                child: buildEditingUserFrame(
-                  child: Transform(
-                    alignment: Alignment.center,
-                    transform: item.isFlip
-                        ? Matrix4.rotationY(math.pi)
-                        : Matrix4.identity(),
+            /// show widget
+            child: buildEditFrame(
+              isShow: isSelected,
+              child: buildEditingUserFrame(
+                child: Transform(
+                  alignment: Alignment.center,
+                  transform: item.isFlip
+                      ? Matrix4.rotationY(math.pi)
+                      : Matrix4.identity(),
+                  child: SizedBox(
+                    width: item.size.width.w * item.scale,
+                    height: item.size.height.w * item.scale,
                     child: contentWidget,
                   ),
                 ),
               ),
-              // child: isSelected
-              //     ? buildEditFrame(child: contentWidget)
-              //     : buildEditingUserFrame(child: contentWidget),
             ),
           ),
         ),

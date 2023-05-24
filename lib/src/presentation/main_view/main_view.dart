@@ -1,5 +1,7 @@
 // ignore_for_file: must_be_immutable
 
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -610,12 +612,14 @@ class MainViewState extends State<MainView> {
     final delta = details.focalPoint - _initPos;
 
     final left = (delta.dx / screenUtil.screenWidth) + _currentPos.dx;
-    final top = (delta.dy / screenUtil.screenHeight) + _currentPos.dy;
-
+    final top = (delta.dy / screenUtil.screenWidth) + _currentPos.dy;
+    final newScale = details.scale * _currentScale;
+    log('newScale: $newScale, ${details.scale}, $_currentScale');
+    log('newWidth: ${_activeItem!.size.width * newScale}');
     setState(() {
       _activeItem!.position = Offset(left, top);
       _activeItem!.rotation = details.rotation + _currentRotation;
-      _activeItem!.scale = details.scale * _currentScale;
+      _activeItem!.scale = newScale;
     });
   }
 
