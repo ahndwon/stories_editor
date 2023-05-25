@@ -1,19 +1,35 @@
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 extension ScreenUtilNormalizer on ScreenUtil {
-  double normalizeByHeight(double value) {
+  double normalizeByScreenHeight(double value) {
     return value / screenHeight;
   }
 
-  double normalizeByWidth(double value) {
+  double normalizeByScreenWidth(double value) {
     return value / screenWidth;
   }
 
-  double denormalizeByHeight(double value) {
+  double denormalizeByScreenHeight(double value) {
     return value * screenHeight;
   }
 
-  double denormalizeByWidth(double value) {
+  double denormalizeByScreenWidth(double value) {
     return value * screenWidth;
+  }
+
+  double normalizeByScaleHeight(double value) {
+    return value / scaleHeight;
+  }
+
+  double normalizeByScaleWidth(double value) {
+    return value / scaleWidth;
+  }
+
+  double denormalizeByScaleHeight(double value) {
+    return value * scaleHeight;
+  }
+
+  double denormalizeByScaleWidth(double value) {
+    return value * scaleWidth;
   }
 }

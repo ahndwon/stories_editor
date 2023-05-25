@@ -20,6 +20,7 @@ export 'package:stories_editor/src/domain/providers/notifiers/control_provider.d
 export 'package:stories_editor/src/domain/providers/notifiers/draggable_widget_notifier.dart';
 export 'package:stories_editor/src/domain/providers/notifiers/painting_notifier.dart';
 export 'package:stories_editor/src/presentation/utils/constants/app_enums.dart';
+export 'package:stories_editor/src/presentation/utils/screen_util_helper.dart';
 export 'package:stories_editor/stories_editor.dart';
 
 class StoriesEditor extends StatefulWidget {
@@ -176,29 +177,27 @@ class StoriesEditorState extends State<StoriesEditor> {
                   widget.textEditingController ?? TextEditingNotifier(),
             ),
           ],
-          child: SafeArea(
-            child: MainView(
-              giphyKey: widget.giphyKey,
-              onDone: widget.onDone,
-              fontFamilyList: widget.fontFamilyList,
-              isCustomFontList: widget.isCustomFontList,
-              middleBottomWidget: widget.middleBottomWidget,
-              centerWidgetBuilder: widget.centerWidgetBuilder,
-              gradientColors: widget.gradientColors,
-              colorList: widget.colorList,
-              onDoneButtonStyle: widget.onDoneButtonStyle,
-              onBackPress: widget.onBackPress,
-              editorBackgroundColor: widget.editorBackgroundColor,
-              galleryThumbnailQuality: widget.galleryThumbnailQuality,
-              onMoveDraggable: widget.onMoveDraggable,
-              onMoveEndDraggable: widget.onMoveEndDraggable,
-              onRemoveDraggable: widget.onRemoveDraggable,
-              onChatButtonClick: widget.onChatButtonClick,
-              actions: widget.actions,
-              title: widget.title,
-              onUndo: widget.onUndo,
-              onRedo: widget.onRedo,
-            ),
+          child: MainView(
+            giphyKey: widget.giphyKey,
+            onDone: widget.onDone,
+            fontFamilyList: widget.fontFamilyList,
+            isCustomFontList: widget.isCustomFontList,
+            middleBottomWidget: widget.middleBottomWidget,
+            centerWidgetBuilder: widget.centerWidgetBuilder,
+            gradientColors: widget.gradientColors,
+            colorList: widget.colorList,
+            onDoneButtonStyle: widget.onDoneButtonStyle,
+            onBackPress: widget.onBackPress,
+            editorBackgroundColor: widget.editorBackgroundColor,
+            galleryThumbnailQuality: widget.galleryThumbnailQuality,
+            onMoveDraggable: widget.onMoveDraggable,
+            onMoveEndDraggable: widget.onMoveEndDraggable,
+            onRemoveDraggable: widget.onRemoveDraggable,
+            onChatButtonClick: widget.onChatButtonClick,
+            actions: widget.actions,
+            title: widget.title,
+            onUndo: widget.onUndo,
+            onRedo: widget.onRedo,
           ),
         ),
       ),

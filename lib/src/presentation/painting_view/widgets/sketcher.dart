@@ -19,27 +19,28 @@ class Sketcher extends CustomPainter {
           paint = Paint()..color = lines[i].lineColor;
 
           outlinePoints = getStroke(
+            /// coordinates
+            // lines[i].points,
+            lines[i].denormalizedPoints(),
 
-              /// coordinates
-              lines[i].points,
+            /// line width
+            size: lines[i].size,
 
-              /// line width
-              size: lines[i].size,
+            /// line thin
+            thinning: 1,
 
-              /// line thin
-              thinning: 1,
+            /// line smooth
+            smoothing: 1,
 
-              /// line smooth
-              smoothing: 1,
-
-              /// on complete line
-              isComplete: lines[i].isComplete,
-              streamline: 1,
-              taperEnd: 0,
-              taperStart: 0,
-              capEnd: true,
-              simulatePressure: true,
-              capStart: true);
+            /// on complete line
+            isComplete: lines[i].isComplete,
+            streamline: 1,
+            taperEnd: 0,
+            taperStart: 0,
+            capEnd: true,
+            simulatePressure: true,
+            capStart: true,
+          );
           break;
         case PaintingType.marker:
           paint = Paint()
@@ -51,7 +52,8 @@ class Sketcher extends CustomPainter {
             ..style = PaintingStyle.fill;
           outlinePoints = getStroke(
             /// coordinates
-            lines[i].points,
+            // lines[i].points,
+            lines[i].denormalizedPoints(),
 
             /// line width
             size: lines[i].size,
@@ -78,27 +80,28 @@ class Sketcher extends CustomPainter {
             ..style = PaintingStyle.stroke;
 
           outlinePoints = getStroke(
+            /// coordinates
+            // lines[i].points,
+            lines[i].denormalizedPoints(),
 
-              /// coordinates
-              lines[i].points,
+            /// line width
+            size: lines[i].size,
 
-              /// line width
-              size: lines[i].size,
+            /// line thin
+            thinning: -0.1,
 
-              /// line thin
-              thinning: -0.1,
+            /// line smooth
+            smoothing: 1,
 
-              /// line smooth
-              smoothing: 1,
-
-              /// on complete line
-              isComplete: lines[i].isComplete,
-              streamline: lines[i].streamline,
-              simulatePressure: lines[i].simulatePressure,
-              taperStart: 0,
-              taperEnd: 0,
-              capStart: true,
-              capEnd: true);
+            /// on complete line
+            isComplete: lines[i].isComplete,
+            streamline: lines[i].streamline,
+            simulatePressure: lines[i].simulatePressure,
+            taperStart: 0,
+            taperEnd: 0,
+            capStart: true,
+            capEnd: true,
+          );
           break;
       }
 
@@ -108,8 +111,12 @@ class Sketcher extends CustomPainter {
         return;
       } else if (outlinePoints.length < 2) {
         /// If the path only has one line, draw a dot.
-        path.addOval(Rect.fromCircle(
-            center: Offset(outlinePoints[0].x, outlinePoints[0].y), radius: 1));
+        path.addOval(
+          Rect.fromCircle(
+            center: Offset(outlinePoints[0].x, outlinePoints[0].y),
+            radius: 1,
+          ),
+        );
       } else {
         /// Otherwise, draw a line that connects each point with a curve.
         path.moveTo(outlinePoints[0].x, outlinePoints[0].y);
@@ -118,7 +125,11 @@ class Sketcher extends CustomPainter {
           final p0 = outlinePoints[i];
           final p1 = outlinePoints[i + 1];
           path.quadraticBezierTo(
-              p0.x, p0.y, (p0.x + p1.x) / 2, (p0.y + p1.y) / 2);
+            p0.x,
+            p0.y,
+            (p0.x + p1.x) / 2,
+            (p0.y + p1.y) / 2,
+          );
         }
       }
 

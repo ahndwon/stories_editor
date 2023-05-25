@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:perfect_freehand/perfect_freehand.dart';
 import 'package:stories_editor/src/domain/converters/color_converter.dart';
 import 'package:stories_editor/src/domain/converters/point_converter.dart';
 import 'package:stories_editor/src/presentation/utils/constants/app_enums.dart';
+import 'package:stories_editor/stories_editor.dart';
 import 'package:uuid/uuid.dart';
 
 part 'painting_model.g.dart';
@@ -57,4 +59,22 @@ class PaintingModel {
       _$PaintingModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$PaintingModelToJson(this);
+
+  List<Point> denormalizedPoints() {
+    final su = ScreenUtil();
+    return points
+        .map(
+          (e) => Point(su.denormalizeByScaleWidth(e.x), su.denormalizeByScaleWidth(e.y)),
+        )
+        .toList();
+  }
+
+  List<Point> normalizedPoints() {
+    final su = ScreenUtil();
+    return points
+        .map(
+          (e) => Point(su.normalizeByScaleWidth(e.x), su.normalizeByScaleWidth(e.y)),
+    )
+        .toList();
+  }
 }

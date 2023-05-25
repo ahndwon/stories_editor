@@ -209,10 +209,10 @@ class DraggableWidget extends StatelessWidget {
         duration: const Duration(milliseconds: 100),
         dy: item.deletePosition
             ? _deleteTopOffset()
-            : screenUtil.denormalizeByWidth(item.position.dy),
+            : screenUtil.denormalizeByScreenWidth(item.position.dy),
         dx: item.deletePosition
             ? 0
-            : screenUtil.denormalizeByWidth(item.position.dx),
+            : screenUtil.denormalizeByScreenWidth(item.position.dx),
         alignment: Alignment.center,
         child: Transform.rotate(
           angle: item.rotation,

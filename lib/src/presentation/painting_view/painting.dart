@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ import 'package:stories_editor/src/domain/providers/notifiers/control_provider.d
 import 'package:stories_editor/src/domain/providers/notifiers/painting_notifier.dart';
 import 'package:stories_editor/src/presentation/painting_view/widgets/sketcher.dart';
 import 'package:stories_editor/src/presentation/painting_view/widgets/top_painting_tools.dart';
+import 'package:stories_editor/src/presentation/utils/screen_util_helper.dart';
 import 'package:stories_editor/src/presentation/widgets/color_selector.dart';
 import 'package:stories_editor/src/presentation/widgets/size_slider_selector.dart';
 
@@ -44,7 +46,8 @@ class _PaintingState extends State<Painting> {
     PaintingModel? line;
 
     /// screen size
-    var screenSize = MediaQueryData.fromWindow(WidgetsBinding.instance.window);
+    // var screenSize = MediaQueryData.fromWindow(WidgetsBinding.instance.window);
+    var screenSize = MediaQueryData.fromView(View.of(context));
 
     /// on gestures start
     void _onPanStart(
@@ -54,15 +57,21 @@ class _PaintingState extends State<Painting> {
     ) {
       final box = context.findRenderObject() as RenderBox;
       final offset = box.globalToLocal(details.globalPosition);
-      final point = Point(offset.dx, offset.dy);
+      final point = Point(
+        ScreenUtil().normalizeByScaleWidth(offset.dx),
+        ScreenUtil().normalizeByScaleWidth(offset.dy),
+      );
+      log('_onPanStart offset : $offset');
+      log('_onPanStart point : ${point.x}, ${point.y}');
+      // final point = Point(offset.dx, offset.dy);
       final points = [point];
 
       /// validate allow pan area
-      if (point.y >= 4 &&
-          point.y <=
-              (Platform.isIOS
-                  ? (screenSize.size.height - 132) - screenSize.viewPadding.top
-                  : screenSize.size.height - 132)) {
+      // if (point.y >= 4 &&
+      //     point.y <=
+      //         (Platform.isIOS
+      //             ? (screenSize.size.height - 132) - screenSize.viewPadding.top
+      //             : screenSize.size.height - 132)) {
         line = PaintingModel(
           points,
           paintingNotifier.lineWidth,
@@ -74,7 +83,7 @@ class _PaintingState extends State<Painting> {
           true,
           paintingNotifier.paintingType,
         );
-      }
+      // }
     }
 
     /// on gestures update
@@ -85,15 +94,19 @@ class _PaintingState extends State<Painting> {
     ) {
       final box = context.findRenderObject() as RenderBox;
       final offset = box.globalToLocal(details.globalPosition);
-      final point = Point(offset.dx, offset.dy);
+      // final point = Point(offset.dx, offset.dy);
+      final point = Point(
+        ScreenUtil().normalizeByScaleWidth(offset.dx),
+        ScreenUtil().normalizeByScaleWidth(offset.dy),
+      );
       final points = [...line!.points, point];
 
       /// validate allow pan area
-      if (point.y >= 6 &&
-          point.y <=
-              (Platform.isIOS
-                  ? (screenSize.size.height - 132) - screenSize.viewPadding.top
-                  : screenSize.size.height - 132)) {
+      // if (point.y >= 6 &&
+      //     point.y <=
+      //         (Platform.isIOS
+      //             ? (screenSize.size.height - 132) - screenSize.viewPadding.top
+      //             : screenSize.size.height - 132)) {
         line = PaintingModel(
           points,
           paintingNotifier.lineWidth,
@@ -106,7 +119,7 @@ class _PaintingState extends State<Painting> {
           paintingNotifier.paintingType,
         );
         paintingNotifier.currentLineStreamController.add(line!);
-      }
+      // }
     }
 
     /// on gestures end
