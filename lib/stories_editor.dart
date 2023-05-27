@@ -125,14 +125,9 @@ class StoriesEditorState extends State<StoriesEditor> {
   void initState() {
     Paint.enableDithering = true;
     WidgetsFlutterBinding.ensureInitialized();
-    SystemChrome.setPreferredOrientations(
-      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown],
-    );
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.black,
-      ),
-    );
+    // SystemChrome.setPreferredOrientations(
+    //   [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown],
+    // );
     super.initState();
   }
 
@@ -155,6 +150,7 @@ class StoriesEditorState extends State<StoriesEditor> {
       },
       child: ScreenUtilInit(
         designSize: const Size(1080, 1920),
+        // designSize: const Size(960, 1280),
         builder: (_, __) => MultiProvider(
           providers: [
             ChangeNotifierProvider(

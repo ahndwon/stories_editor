@@ -28,21 +28,18 @@ class TopToolBar extends StatelessWidget {
     this.title,
   }) : super(key: key);
 
-  static const _toolbarHeight = 100.0;
+  static const _toolbarHeight = 60.0;
 
   @override
   Widget build(BuildContext context) {
     return Consumer3<ControlNotifier, ScrollNotifier, DraggableWidgetNotifier>(
       builder: (_, controlNotifier, scrollNotifier, itemNotifier, __) {
-        return SizedBox(
-          height: _toolbarHeight,
-          child: AppBar(
-            toolbarHeight: _toolbarHeight,
-            elevation: 0,
-            backgroundColor: Colors.transparent,
-            actions: actions,
-            title: title,
-          ),
+        return AppBar(
+          toolbarHeight: _toolbarHeight,
+          elevation: 0,
+          backgroundColor: Colors.green,
+          actions: actions,
+          title: title,
         );
         // return Container(
         //   height: 110,

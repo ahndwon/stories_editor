@@ -1,8 +1,8 @@
 // ignore_for_file: must_be_immutable
 
 import 'dart:developer';
+import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -24,6 +24,7 @@ import 'package:stories_editor/src/presentation/draggable_items/draggable_widget
 import 'package:stories_editor/src/presentation/painting_view/painting.dart';
 import 'package:stories_editor/src/presentation/painting_view/widgets/sketcher.dart';
 import 'package:stories_editor/src/presentation/text_editor_view/TextEditor.dart';
+import 'package:stories_editor/src/presentation/utils/Extensions/context_extension.dart';
 import 'package:stories_editor/src/presentation/utils/constants/app_enums.dart';
 import 'package:stories_editor/src/presentation/utils/modal_sheets.dart';
 import 'package:stories_editor/src/presentation/widgets/animated_onTap_button.dart';
@@ -168,36 +169,50 @@ class MainViewState extends State<MainView> {
     final screenUtil = ScreenUtil();
     return WillPopScope(
       onWillPop: _popScope,
-      child: Material(
-        color: widget.editorBackgroundColor == Colors.transparent
-            ? Colors.black
-            : widget.editorBackgroundColor ?? Colors.black,
-        child: Consumer6<
-            ControlNotifier,
-            DraggableWidgetNotifier,
-            ScrollNotifier,
-            GradientNotifier,
-            PaintingNotifier,
-            TextEditingNotifier>(
-          builder: (
-            context,
-            controlNotifier,
-            itemProvider,
-            scrollProvider,
-            colorProvider,
-            paintingProvider,
-            editingProvider,
-            child,
-          ) {
-            return buildMainView(
-              controlNotifier,
-              screenUtil,
-              colorProvider,
-              itemProvider,
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          // backgroundColor: Colors.green,
+          actions: widget.actions,
+          title: widget.title,
+          systemOverlayStyle: const SystemUiOverlayStyle(
+            statusBarIconBrightness: Brightness.dark,
+            statusBarBrightness: Brightness.dark,
+          ),
+        ),
+        body: Material(
+          color: widget.editorBackgroundColor == Colors.transparent
+              ? Colors.black
+              : widget.editorBackgroundColor ?? Colors.black,
+          child: Consumer6<
+              ControlNotifier,
+              DraggableWidgetNotifier,
+              ScrollNotifier,
+              GradientNotifier,
+              PaintingNotifier,
+              TextEditingNotifier>(
+            builder: (
               context,
+              controlNotifier,
+              itemProvider,
+              scrollProvider,
+              colorProvider,
               paintingProvider,
-            );
-          },
+              editingProvider,
+              child,
+            ) {
+              return buildMainView(
+                controlNotifier,
+                screenUtil,
+                colorProvider,
+                itemProvider,
+                context,
+                paintingProvider,
+              );
+            },
+          ),
         ),
       ),
     );
@@ -211,12 +226,16 @@ class MainViewState extends State<MainView> {
     BuildContext context,
     PaintingNotifier paintingProvider,
   ) {
-    var index = 0;
+    final statusBarPadding = getStatusBarPadding();
 
     return Column(
       children: [
+        SizedBox(height: statusBarPadding),
+
         /// bottom tools
-        Expanded(
+        AspectRatio(
+          aspectRatio: 9 / 16,
+          // aspectRatio: 3 / 4,
           child: Stack(
             alignment: Alignment.center,
             children: [
@@ -245,8 +264,6 @@ class MainViewState extends State<MainView> {
                           duration: const Duration(milliseconds: 1000),
                           curve: Curves.easeIn,
                           decoration: BoxDecoration(
-                            //   color: _isInitialValue ? Colors.blue : Colors.red,
-
                             gradient: controlNotifier.mediaPath.isEmpty
                                 ? LinearGradient(
                                     colors: controlNotifier.gradientColors![
@@ -349,6 +366,18 @@ class MainViewState extends State<MainView> {
                                     ),
                                   ),
                                 ),
+                                Center(
+                                  child: Container(
+                                    color: Colors.red,
+                                    width: 1,
+                                  ),
+                                ),
+                                Center(
+                                  child: Container(
+                                    color: Colors.red,
+                                    height: 1,
+                                  ),
+                                ),
                                 // Align(
                                 //   alignment: Alignment.bottomCenter,
                                 //   child: Padding(
@@ -363,6 +392,14 @@ class MainViewState extends State<MainView> {
                                 //     ),
                                 //   ),
                                 // ),
+                                if (!context.isLongerThan9to16Ratio)
+                                  Align(
+                                    alignment: Alignment.topCenter,
+                                    child: Container(
+                                      height: 20,
+                                      color: Colors.white.withOpacity(0.15),
+                                    ),
+                                  )
                               ],
                             ),
                           ),
@@ -372,11 +409,6 @@ class MainViewState extends State<MainView> {
                   ),
                 ),
               ),
-              if (!kIsWeb)
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: buildTopToolBar(),
-                ),
 
               /// middle text
               if (itemProvider.draggableWidget.isEmpty &&
@@ -419,14 +451,15 @@ class MainViewState extends State<MainView> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     buildHelpTools(),
-                    Visibility(
-                      visible: !controlNotifier.isTextEditing &&
-                          !controlNotifier.isPainting,
-                      child: MainTools(
-                        contentKey: contentKey,
-                        context: context,
+                    if (!context.isLongerThan9to16Ratio)
+                      Visibility(
+                        visible: !controlNotifier.isTextEditing &&
+                            !controlNotifier.isPainting,
+                        child: MainTools(
+                          contentKey: contentKey,
+                          context: context,
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ),
@@ -447,6 +480,25 @@ class MainViewState extends State<MainView> {
             ],
           ),
         ),
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // buildHelpTools(),
+            if (context.isLongerThan9to16Ratio)
+              Visibility(
+                visible: !controlNotifier.isTextEditing &&
+                    !controlNotifier.isPainting,
+                child: MainTools(
+                  contentKey: contentKey,
+                  context: context,
+                ),
+              ),
+          ],
+        )
+        // Container(
+        //   height: 50.h,
+        //   color: Colors.black,
+        // ),
       ],
     );
   }
@@ -614,8 +666,8 @@ class MainViewState extends State<MainView> {
     final left = (delta.dx / screenUtil.screenWidth) + _currentPos.dx;
     final top = (delta.dy / screenUtil.screenWidth) + _currentPos.dy;
     final newScale = details.scale * _currentScale;
-    log('newScale: $newScale, ${details.scale}, $_currentScale');
-    log('newWidth: ${_activeItem!.size.width * newScale}');
+    // log('newScale: $newScale, ${details.scale}, $_currentScale');
+    // log('newWidth: ${_activeItem!.size.width * newScale}');
     setState(() {
       _activeItem!.position = Offset(left, top);
       _activeItem!.rotation = details.rotation + _currentRotation;
@@ -736,5 +788,17 @@ class MainViewState extends State<MainView> {
         ),
       ],
     );
+  }
+
+  double getStatusBarPadding() {
+    var statusBarPadding = 0.0;
+    if (context.isLongerThan9to16Ratio) {
+      if (Platform.isIOS) {
+        statusBarPadding = 66.0;
+      } else {
+        statusBarPadding = 40.0;
+      }
+    }
+    return statusBarPadding;
   }
 }

@@ -64,7 +64,10 @@ class PaintingModel {
     final su = ScreenUtil();
     return points
         .map(
-          (e) => Point(su.denormalizeByScaleWidth(e.x), su.denormalizeByScaleWidth(e.y)),
+          (e) => Point(
+            su.denormalizeByScaleWidth(e.x),
+            su.denormalizeByScaleWidth(e.y),
+          ),
         )
         .toList();
   }
@@ -73,8 +76,11 @@ class PaintingModel {
     final su = ScreenUtil();
     return points
         .map(
-          (e) => Point(su.normalizeByScaleWidth(e.x), su.normalizeByScaleWidth(e.y)),
-    )
+          (e) => Point(
+            su.normalizeByScaleWidth(e.x),
+            su.normalizeByScaleWidth(e.y),
+          ),
+        )
         .toList();
   }
 }
