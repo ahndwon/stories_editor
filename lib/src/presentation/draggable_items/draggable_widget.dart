@@ -162,38 +162,30 @@ class DraggableWidget extends StatelessWidget {
         contentWidget = SizedBox(
           width: 150,
           height: 150,
-          child: Stack(
+          child: Container(
             alignment: Alignment.center,
-            children: [
-              /// create Gif widget
-              Center(
-                child: Container(
-                  alignment: Alignment.center,
-                  padding: const EdgeInsets.all(8),
-                  decoration: isSelected ? decoration : const BoxDecoration(),
-                  child: Image.network(
-                    key: ValueKey(item.gif.id),
-                    item.gif.url,
-                    loadingBuilder: (
-                      context,
-                      child,
-                      loadingProgress,
-                    ) {
-                      if (loadingProgress?.cumulativeBytesLoaded !=
-                          loadingProgress?.cumulativeBytesLoaded) {
-                        return const CircularProgressIndicator();
-                      }
-                      return child;
-                    },
-                  ),
-                  // child: GiphyRenderImage(
-                  //   key: ValueKey(item.gif.id),
-                  //   url: item.gif.stillUrl,
-                  //   renderGiphyOverlay: false,
-                  // ),
-                ),
-              ),
-            ],
+            padding: const EdgeInsets.all(8),
+            decoration: isSelected ? decoration : const BoxDecoration(),
+            child: Image.network(
+              key: ValueKey(item.gif.id),
+              item.gif.url,
+              loadingBuilder: (
+                context,
+                child,
+                loadingProgress,
+              ) {
+                if (loadingProgress?.cumulativeBytesLoaded !=
+                    loadingProgress?.cumulativeBytesLoaded) {
+                  return const CircularProgressIndicator();
+                }
+                return child;
+              },
+            ),
+            // child: GiphyRenderImage(
+            //   key: ValueKey(item.gif.id),
+            //   url: item.gif.stillUrl,
+            //   renderGiphyOverlay: false,
+            // ),
           ),
         );
         break;
@@ -231,6 +223,8 @@ class DraggableWidget extends StatelessWidget {
                       ? Matrix4.rotationY(math.pi)
                       : Matrix4.identity(),
                   child: SizedBox(
+                    // width: item.size.width,
+                    // height: item.size.height,
                     width: item.size.width.w * item.scale,
                     height: item.size.height.w * item.scale,
                     child: contentWidget,
