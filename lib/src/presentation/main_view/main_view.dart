@@ -129,6 +129,7 @@ class MainViewState extends State<MainView> {
   /// Gesture Detector listen changes
   Offset _initPos = Offset.zero;
   Offset _currentPos = Offset.zero;
+  Size _initSize = Size.zero;
   double _currentScale = 1;
   double _currentRotation = 0;
 
@@ -261,7 +262,7 @@ class MainViewState extends State<MainView> {
                       child: RepaintBoundary(
                         key: contentKey,
                         child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 1000),
+                          duration: const Duration(milliseconds: 500),
                           curve: Curves.easeIn,
                           decoration: BoxDecoration(
                             gradient: controlNotifier.mediaPath.isEmpty
@@ -650,6 +651,7 @@ class MainViewState extends State<MainView> {
       return;
     }
     _initPos = details.focalPoint;
+    _initSize = _activeItem!.size;
     _currentPos = _activeItem!.position;
     _currentScale = _activeItem!.scale;
     _currentRotation = _activeItem!.rotation;
@@ -658,7 +660,8 @@ class MainViewState extends State<MainView> {
   /// update item scale
   void _onScaleUpdate(ScaleUpdateDetails details) {
     final screenUtil = ScreenUtil();
-    if (_activeItem == null) {
+    final activeItem = _activeItem;
+    if (activeItem == null) {
       return;
     }
     final delta = details.focalPoint - _initPos;
@@ -669,9 +672,13 @@ class MainViewState extends State<MainView> {
     // log('newScale: $newScale, ${details.scale}, $_currentScale');
     // log('newWidth: ${_activeItem!.size.width * newScale}');
     setState(() {
-      _activeItem!.position = Offset(left, top);
-      _activeItem!.rotation = details.rotation + _currentRotation;
-      _activeItem!.scale = newScale;
+      _activeItem!
+        ..position = Offset(left, top)
+        ..rotation = details.rotation + _currentRotation;
+      // _activeItem!.size = _initSize * newScale;
+      if ((activeItem.size.width * newScale) < 1000) {
+        _activeItem!.scale = newScale;
+      }
     });
   }
 
