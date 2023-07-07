@@ -3,11 +3,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gallery_media_picker/gallery_media_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:stories_editor/src/domain/models/sticker_item.dart';
 import 'package:stories_editor/src/domain/sevices/save_as_image.dart';
 import 'package:stories_editor/src/presentation/utils/modal_sheets.dart';
 import 'package:stories_editor/src/presentation/widgets/animated_onTap_button.dart';
 import 'package:stories_editor/src/presentation/widgets/tool_button.dart';
 import 'package:stories_editor/stories_editor.dart';
+import 'package:uuid/uuid.dart';
 
 class MainTools extends StatefulWidget {
   const MainTools({super.key, required this.contentKey, required this.context});
@@ -308,10 +310,10 @@ class MainToolsState extends State<MainTools> {
         controlNotifier.mediaPath = path.first.path!;
         if (controlNotifier.mediaPath.isNotEmpty) {
           itemProvider.insert(
-            EditableItem()
-              ..imageUrl = path.first.path!
-              ..type = ItemType.image
-              ..position = Offset.zero,
+            ImageSticker(
+              id: const Uuid().v4(),
+              url: path.first.path!,
+            ),
           );
         }
         Navigator.of(context).pop();

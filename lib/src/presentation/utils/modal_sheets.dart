@@ -2,18 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:modal_gif_picker/modal_gif_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:stories_editor/src/domain/models/editable_items.dart';
+import 'package:stories_editor/src/domain/models/sticker_item.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/control_provider.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/draggable_widget_notifier.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/painting_notifier.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/text_editing_notifier.dart';
 import 'package:stories_editor/src/domain/sevices/save_as_image.dart';
 import 'package:stories_editor/src/presentation/utils/Extensions/hexColor.dart';
-import 'package:stories_editor/src/presentation/utils/constants/app_enums.dart';
 import 'package:stories_editor/src/presentation/widgets/animated_onTap_button.dart';
 
 /// create item of type GIF
-Future createGiphyItem({
+Future<void> createGiphyItem({
   required BuildContext context,
   required String giphyKey,
 }) async {
@@ -32,16 +31,19 @@ Future createGiphyItem({
 
   /// create item of type GIF
   if (giphy != null) {
-    editableItem.insert(
-      EditableItem()
-        ..type = ItemType.gif
-        ..gif = SimpleGiphyGif(
-          id: giphy.id,
-          url: giphy.images.original?.url ?? '',
-          stillUrl: giphy.images.originalStill?.url ?? '',
-        )
-        ..position = Offset.zero,
-    );
+    editableItem.insert(GiphySticker(
+      id: giphy.id,
+      url: giphy.images.original?.url ?? '',
+      stillUrl: giphy.images.originalStill?.url ?? '',
+    )
+        // ..type = ItemType.gif
+        // ..gif = SimpleGiphyGif(
+        //   id: giphy.id,
+        //   url: giphy.images.original?.url ?? '',
+        //   stillUrl: giphy.images.originalStill?.url ?? '',
+        // )
+        // ..position = Offset.zero,
+        );
     // editableItem.giphy = giphy;
   }
 }

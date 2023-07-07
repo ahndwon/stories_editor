@@ -8,21 +8,23 @@ import 'package:stories_editor/stories_editor.dart';
 
 part 'sticker_item.g.dart';
 
-sealed class StickerItem {
+@JsonSerializable(explicitToJson: true)
+sealed class StickerItem implements Comparable<StickerItem> {
   StickerItem({
     required this.id,
     required this.type,
-    required this.size,
+    this.size = const Size(200, 200),
     this.scale = 1.0,
     this.rotation = 0,
+    this.position = Offset.zero,
   });
 
   final StickerItemType type;
   final String id;
   @SizeConverter()
   final Size size;
-  final double scale;
-  final double rotation;
+  double scale;
+  double rotation;
   @OffsetConverter()
   Offset position = Offset.zero;
   bool isFlip = false;
@@ -33,15 +35,21 @@ sealed class StickerItem {
 
   static StickerItem fromJson(Map<String, dynamic> json) =>
       const StickerItemConverter().fromJson(json);
+
+  @override
+  int compareTo(StickerItem other) => other.id.compareTo(id);
+
+  @override
+  String toString() => toJson().toString();
 }
 
 @JsonSerializable(explicitToJson: true)
 class FrameSticker extends StickerItem {
   FrameSticker({
     required super.id,
-    required super.size,
-    required super.type,
-    required super.scale,
+    super.type = StickerItemType.frame,
+    super.scale = 1.0,
+    super.size = const Size(200, 200),
   });
 
   @override
@@ -55,13 +63,13 @@ class FrameSticker extends StickerItem {
 class ImageSticker extends StickerItem {
   ImageSticker({
     required super.id,
-    required super.size,
     required this.url,
-    required super.type,
-    required super.scale,
+    super.size = const Size(200, 200),
+    super.type = StickerItemType.image,
+    super.scale = 1.0,
   });
 
-  final String url;
+  String url;
 
   @override
   Map<String, dynamic> toJson() => _$ImageStickerToJson(this);
@@ -75,10 +83,10 @@ class GiphySticker extends StickerItem {
   GiphySticker({
     this.stillUrl,
     required super.id,
-    required super.size,
     required this.url,
-    required super.type,
-    required super.scale,
+    super.size = const Size(200, 200),
+    super.type = StickerItemType.giphy,
+    super.scale = 1.0,
   });
 
   final String url;
@@ -95,19 +103,20 @@ class GiphySticker extends StickerItem {
 class TextSticker extends StickerItem {
   TextSticker({
     required super.id,
-    required super.size,
     required this.text,
+    super.size = const Size(200, 200),
     this.fontSize = 16,
-    required super.type,
+    super.type = StickerItemType.text,
     super.scale,
-
+    this.textList = const [],
   });
 
   final String text;
+  final List<String> textList;
   final double fontSize;
   @ColorConverter()
   Color backGroundColor = Colors.transparent;
-  final animationType = TextAnimationType.none;
+  TextAnimationType animationType = TextAnimationType.none;
   @ColorConverter()
   Color textColor = Colors.transparent;
   TextAlign textAlign = TextAlign.center;

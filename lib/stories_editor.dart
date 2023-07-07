@@ -2,10 +2,9 @@
 library stories_editor;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:stories_editor/src/domain/models/editable_items.dart';
+import 'package:stories_editor/src/domain/models/sticker_item.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/control_provider.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/draggable_widget_notifier.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/gradient_notifier.dart';
@@ -16,6 +15,7 @@ import 'package:stories_editor/src/presentation/main_view/main_view.dart';
 
 export 'package:stories_editor/src/domain/models/editable_items.dart';
 export 'package:stories_editor/src/domain/models/painting_model.dart';
+export 'package:stories_editor/src/domain/models/sticker_item.dart';
 export 'package:stories_editor/src/domain/providers/notifiers/control_provider.dart';
 export 'package:stories_editor/src/domain/providers/notifiers/draggable_widget_notifier.dart';
 export 'package:stories_editor/src/domain/providers/notifiers/painting_notifier.dart';
@@ -106,9 +106,9 @@ class StoriesEditor extends StatefulWidget {
   final GradientNotifier? gradientController;
   final PaintingNotifier? paintingController;
   final TextEditingNotifier? textEditingController;
-  final void Function(EditableItem)? onAddDraggable;
-  final void Function(EditableItem)? onMoveDraggable;
-  final void Function(EditableItem)? onMoveEndDraggable;
+  final void Function(StickerItem)? onAddDraggable;
+  final void Function(StickerItem)? onMoveDraggable;
+  final void Function(StickerItem)? onMoveEndDraggable;
   final void Function(String)? onRemoveDraggable;
   final void Function()? onChatButtonClick;
 

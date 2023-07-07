@@ -1,6 +1,5 @@
 // ignore_for_file: must_be_immutable
 
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -9,8 +8,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gallery_media_picker/gallery_media_picker.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
-import 'package:stories_editor/src/domain/models/editable_items.dart';
 import 'package:stories_editor/src/domain/models/painting_model.dart';
+import 'package:stories_editor/src/domain/models/sticker_item.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/control_provider.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/draggable_widget_notifier.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/gradient_notifier.dart';
@@ -25,9 +24,9 @@ import 'package:stories_editor/src/presentation/painting_view/painting.dart';
 import 'package:stories_editor/src/presentation/painting_view/widgets/sketcher.dart';
 import 'package:stories_editor/src/presentation/text_editor_view/TextEditor.dart';
 import 'package:stories_editor/src/presentation/utils/Extensions/context_extension.dart';
-import 'package:stories_editor/src/presentation/utils/constants/app_enums.dart';
 import 'package:stories_editor/src/presentation/utils/modal_sheets.dart';
 import 'package:stories_editor/src/presentation/widgets/animated_onTap_button.dart';
+import 'package:uuid/uuid.dart';
 
 class MainView extends StatefulWidget {
   MainView({
@@ -95,10 +94,10 @@ class MainView extends StatefulWidget {
   List<Color>? colorList;
 
   // on move item
-  final void Function(EditableItem)? onMoveDraggable;
+  final void Function(StickerItem)? onMoveDraggable;
 
   // on move end item
-  final void Function(EditableItem)? onMoveEndDraggable;
+  final void Function(StickerItem)? onMoveEndDraggable;
 
   // item remove callback
   final void Function(String)? onRemoveDraggable;
@@ -124,7 +123,7 @@ class MainViewState extends State<MainView> {
   final GlobalKey contentKey = GlobalKey();
 
   ///Editable item
-  EditableItem? _activeItem;
+  StickerItem? _activeItem;
 
   /// Gesture Detector listen changes
   Offset _initPos = Offset.zero;
@@ -504,7 +503,7 @@ class MainViewState extends State<MainView> {
     );
   }
 
-  GlobalKey<State<StatefulWidget>> _getOrAddKey(EditableItem editableItem) {
+  GlobalKey<State<StatefulWidget>> _getOrAddKey(StickerItem editableItem) {
     final key = draggableKeys[editableItem.id];
     if (key != null) {
       return key;
@@ -572,9 +571,10 @@ class MainViewState extends State<MainView> {
         controlNotifier.mediaPath = path.first.path!;
         if (controlNotifier.mediaPath.isNotEmpty) {
           itemProvider.insert(
-            EditableItem()
-              ..type = ItemType.image
-              ..position = Offset.zero,
+            ImageSticker(
+              id: const Uuid().v4(),
+              url: path.first.path!,
+            ),
           );
         }
         scrollProvider.pageController.animateToPage(
@@ -660,8 +660,7 @@ class MainViewState extends State<MainView> {
   /// update item scale
   void _onScaleUpdate(ScaleUpdateDetails details) {
     final screenUtil = ScreenUtil();
-    final activeItem = _activeItem;
-    if (activeItem == null) {
+    if (_activeItem == null) {
       return;
     }
     final delta = details.focalPoint - _initPos;
@@ -676,15 +675,15 @@ class MainViewState extends State<MainView> {
         ..position = Offset(left, top)
         ..rotation = details.rotation + _currentRotation;
       // _activeItem!.size = _initSize * newScale;
-      if ((activeItem.size.width * newScale) < 1000) {
+      if ((_activeItem!.size.width * newScale) < 1000) {
         _activeItem!.scale = newScale;
       }
     });
   }
 
   /// active delete widget with offset position
-  void _deletePosition(EditableItem item, PointerMoveEvent details) {
-    if (item.type == ItemType.text &&
+  void _deletePosition(StickerItem item, PointerMoveEvent details) {
+    if (item.type == StickerItemType.text &&
         item.position.dy >= 0.75.h &&
         item.position.dx >= -0.4.w &&
         item.position.dx <= 0.2.w) {
@@ -692,7 +691,7 @@ class MainViewState extends State<MainView> {
         _isDeletePosition = true;
         item.deletePosition = true;
       });
-    } else if (item.type == ItemType.gif &&
+    } else if (item.type == StickerItemType.giphy &&
         item.position.dy >= 0.62.h &&
         item.position.dx >= -0.35.w &&
         item.position.dx <= 0.15) {
@@ -700,7 +699,7 @@ class MainViewState extends State<MainView> {
         _isDeletePosition = true;
         item.deletePosition = true;
       });
-    } else if (item.type == ItemType.image &&
+    } else if (item.type == StickerItemType.image &&
         item.position.dy >= 0.62.h &&
         item.position.dx >= -0.35.w &&
         item.position.dx <= 0.15) {
@@ -717,11 +716,11 @@ class MainViewState extends State<MainView> {
   }
 
   /// delete item widget with offset position
-  void _deleteItemOnCoordinates(EditableItem item, PointerUpEvent details) {
+  void _deleteItemOnCoordinates(StickerItem item, PointerUpEvent details) {
     final itemProvider =
         Provider.of<DraggableWidgetNotifier>(context, listen: false);
     _inAction = false;
-    if (item.type == ItemType.image &&
+    if (item.type == StickerItemType.image &&
         item.position.dy >= 0.62.h &&
         item.position.dx >= -0.35.w &&
         item.position.dx <= 0.15) {
@@ -730,11 +729,11 @@ class MainViewState extends State<MainView> {
         widget.onRemoveDraggable?.call(item.id);
         HapticFeedback.heavyImpact();
       });
-    } else if (item.type == ItemType.text &&
+    } else if (item.type == StickerItemType.text &&
             item.position.dy >= 0.75.h &&
             item.position.dx >= -0.4.w &&
             item.position.dx <= 0.2.w ||
-        item.type == ItemType.gif &&
+        item.type == StickerItemType.giphy &&
             item.position.dy >= 0.62.h &&
             item.position.dx >= -0.35.w &&
             item.position.dx <= 0.15) {
@@ -747,7 +746,7 @@ class MainViewState extends State<MainView> {
   }
 
   /// update item position, scale, rotation
-  void _updateItemPosition(EditableItem item, PointerDownEvent details) {
+  void _updateItemPosition(StickerItem item, PointerDownEvent details) {
     if (_inAction) {
       return;
     }

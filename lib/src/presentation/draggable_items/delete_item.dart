@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stories_editor/src/domain/models/editable_items.dart';
+import 'package:stories_editor/src/domain/models/sticker_item.dart';
 import 'package:stories_editor/src/presentation/utils/constants/app_enums.dart';
 
 class DeleteItem extends StatelessWidget {
   const DeleteItem(
       {Key? key,
-      required EditableItem? activeItem,
+      required StickerItem? activeItem,
       required this.isDeletePosition,
       required this.animationsDuration,
       this.deletedItem})
       : _activeItem = activeItem,
         super(key: key);
 
-  final EditableItem? _activeItem;
+  final StickerItem? _activeItem;
   final bool isDeletePosition;
   final Duration animationsDuration;
   final Widget? deletedItem;
@@ -29,9 +30,10 @@ class DeleteItem extends StatelessWidget {
         child: AnimatedScale(
           curve: Curves.easeIn,
           duration: const Duration(milliseconds: 200),
-          scale: _activeItem != null && _activeItem!.type != ItemType.image
-              ? 1.0
-              : 0.0,
+          scale:
+              _activeItem != null && _activeItem!.type != StickerItemType.image
+                  ? 1.0
+                  : 0.0,
           child: SizedBox(
             width: screenUtil.screenWidth,
             child: Center(

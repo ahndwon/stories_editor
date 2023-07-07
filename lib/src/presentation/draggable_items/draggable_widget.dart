@@ -6,7 +6,7 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:stories_editor/src/domain/models/editable_items.dart';
+import 'package:stories_editor/src/domain/models/sticker_item.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/control_provider.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/draggable_widget_notifier.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/gradient_notifier.dart';
@@ -31,14 +31,14 @@ class DraggableWidget extends StatelessWidget {
     this.frame,
   });
 
-  final EditableItem item;
+  final StickerItem item;
   final void Function(PointerDownEvent)? onPointerDown;
   final void Function(PointerUpEvent)? onPointerUp;
   final void Function(PointerMoveEvent)? onPointerMove;
-  final void Function(EditableItem)? onDeleteTap;
+  final void Function(StickerItem)? onDeleteTap;
   final void Function(PointerDownEvent)? onScaleStart;
   final void Function(PointerMoveEvent)? onScaleMove;
-  final void Function(EditableItem)? onFlipTap;
+  final void Function(StickerItem)? onFlipTap;
   final BuildContext context;
   final bool isSelected;
   final Widget? frame;
@@ -63,7 +63,7 @@ class DraggableWidget extends StatelessWidget {
     }
 
     switch (item.type) {
-      case ItemType.text:
+      case StickerItemType.text:
         contentWidget = IntrinsicWidth(
           child: IntrinsicHeight(
             child: Container(
@@ -118,11 +118,12 @@ class DraggableWidget extends StatelessWidget {
         break;
 
       /// image [file_image_gb.dart]
-      case ItemType.image:
-        final imageUrl = item.imageUrl;
+      case StickerItemType.image:
+        final imageSticker = item as ImageSticker;
+        final imageUrl = imageSticker.url;
         final imageWidth = screenUtil.screenWidth - 200.w;
 
-        if (imageUrl != null && imageUrl.isNotEmpty) {
+        if (imageUrl.isNotEmpty) {
           Widget? imageWidget = const SizedBox();
           if (imageUrl.startsWith('http') || imageUrl.startsWith('https')) {
             // final screenSize = MediaQuery.of(context).size;
@@ -158,7 +159,8 @@ class DraggableWidget extends StatelessWidget {
 
         break;
 
-      case ItemType.gif:
+      case StickerItemType.giphy:
+        final giphy = item as GiphySticker;
         contentWidget = SizedBox(
           width: 150,
           height: 150,
@@ -167,8 +169,8 @@ class DraggableWidget extends StatelessWidget {
             padding: const EdgeInsets.all(8),
             decoration: isSelected ? decoration : const BoxDecoration(),
             child: Image.network(
-              key: ValueKey(item.gif.id),
-              item.gif.url,
+              key: ValueKey(giphy.id),
+              giphy.url,
               loadingBuilder: (
                 context,
                 child,
@@ -190,7 +192,7 @@ class DraggableWidget extends StatelessWidget {
         );
         break;
 
-      case ItemType.video:
+      case StickerItemType.frame:
         contentWidget = const Center();
         break;
     }
@@ -222,13 +224,7 @@ class DraggableWidget extends StatelessWidget {
                   transform: item.isFlip
                       ? Matrix4.rotationY(math.pi)
                       : Matrix4.identity(),
-                  child: SizedBox(
-                    // width: item.size.width,
-                    // height: item.size.height,
-                    width: item.size.width.w * item.scale,
-                    height: item.size.height.w * item.scale,
-                    child: contentWidget,
-                  ),
+                  child: contentWidget,
                 ),
               ),
             ),
@@ -390,12 +386,14 @@ class DraggableWidget extends StatelessWidget {
     required PaintingStyle paintingStyle,
     bool background = false,
   }) {
-    if (item.animationType == TextAnimationType.none) {
+    final textItem = item as TextSticker;
+    if (textItem.animationType == TextAnimationType.none) {
       return Text(
-        item.text,
-        textAlign: item.textAlign,
+        textItem.text,
+        textAlign: textItem.textAlign,
         style: _textStyle(
           controlNotifier: controlNotifier,
+          textItem: textItem,
           paintingStyle: paintingStyle,
           background: background,
         ),
@@ -404,43 +402,44 @@ class DraggableWidget extends StatelessWidget {
       return DefaultTextStyle(
         style: _textStyle(
           controlNotifier: controlNotifier,
+          textItem: textItem,
           paintingStyle: paintingStyle,
           background: background,
         ),
         child: AnimatedTextKit(
           repeatForever: true,
-          onTap: () => _onTap(context, item, controlNotifier),
+          onTap: () => _onTap(context, textItem, controlNotifier),
           animatedTexts: [
-            if (item.animationType == TextAnimationType.scale)
+            if (textItem.animationType == TextAnimationType.scale)
               ScaleAnimatedText(
-                item.text,
+                textItem.text,
                 duration: const Duration(milliseconds: 1200),
               ),
-            if (item.animationType == TextAnimationType.fade)
-              ...item.textList.map(
-                (item) => FadeAnimatedText(
-                  item,
+            if (textItem.animationType == TextAnimationType.fade)
+              ...textItem.textList.map(
+                (textItem) => FadeAnimatedText(
+                  textItem,
                   duration: const Duration(milliseconds: 1200),
                 ),
               ),
-            if (item.animationType == TextAnimationType.typer)
+            if (textItem.animationType == TextAnimationType.typer)
               TyperAnimatedText(
-                item.text,
+                textItem.text,
                 speed: const Duration(milliseconds: 500),
               ),
-            if (item.animationType == TextAnimationType.typeWriter)
+            if (textItem.animationType == TextAnimationType.typeWriter)
               TypewriterAnimatedText(
-                item.text,
+                textItem.text,
                 speed: const Duration(milliseconds: 500),
               ),
-            if (item.animationType == TextAnimationType.wavy)
+            if (textItem.animationType == TextAnimationType.wavy)
               WavyAnimatedText(
-                item.text,
+                textItem.text,
                 speed: const Duration(milliseconds: 500),
               ),
-            if (item.animationType == TextAnimationType.flicker)
+            if (textItem.animationType == TextAnimationType.flicker)
               FlickerAnimatedText(
-                item.text,
+                textItem.text,
                 speed: const Duration(milliseconds: 1200),
               ),
           ],
@@ -451,11 +450,12 @@ class DraggableWidget extends StatelessWidget {
 
   TextStyle _textStyle({
     required ControlNotifier controlNotifier,
+    required TextSticker textItem,
     required PaintingStyle paintingStyle,
     bool background = false,
   }) {
     return TextStyle(
-      fontFamily: controlNotifier.fontList![item.fontFamily],
+      fontFamily: controlNotifier.fontList![textItem.fontFamily],
       package: controlNotifier.isCustomFontList ? null : 'stories_editor',
       fontWeight: FontWeight.w500,
       // shadows: <Shadow>[
@@ -467,11 +467,11 @@ class DraggableWidget extends StatelessWidget {
       //           : Colors.black)
       // ]
     ).copyWith(
-      color: background ? Colors.black : item.textColor,
-      fontSize: item.deletePosition ? 8 : item.fontSize,
+      color: background ? Colors.black : textItem.textColor,
+      fontSize: textItem.deletePosition ? 8 : textItem.fontSize,
       background: Paint()
         ..strokeWidth = 20.0
-        ..color = item.backGroundColor
+        ..color = textItem.backGroundColor
         ..style = paintingStyle
         ..strokeJoin = StrokeJoin.round
         ..filterQuality = FilterQuality.high
@@ -483,9 +483,9 @@ class DraggableWidget extends StatelessWidget {
   double _deleteTopOffset() {
     var top = 0.0;
     final screenUtil = ScreenUtil();
-    if (item.type == ItemType.text) {
+    if (item.type == StickerItemType.text) {
       return top = screenUtil.screenWidth / 1.2;
-    } else if (item.type == ItemType.gif) {
+    } else if (item.type == StickerItemType.giphy) {
       return top = screenUtil.screenWidth / 1.18;
     } else {
       return top;
@@ -494,9 +494,9 @@ class DraggableWidget extends StatelessWidget {
 
   double _deleteScale() {
     var scale = 0.0;
-    if (item.type == ItemType.text) {
+    if (item.type == StickerItemType.text) {
       return scale = 0.4;
-    } else if (item.type == ItemType.gif) {
+    } else if (item.type == StickerItemType.giphy) {
       return scale = 0.3;
     } else {
       return scale;
@@ -506,9 +506,10 @@ class DraggableWidget extends StatelessWidget {
   /// onTap text
   void _onTap(
     BuildContext context,
-    EditableItem item,
+    StickerItem item,
     ControlNotifier controlNotifier,
   ) {
+    item as TextSticker;
     final editorProvider =
         Provider.of<TextEditingNotifier>(this.context, listen: false);
     final itemProvider =

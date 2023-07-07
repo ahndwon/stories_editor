@@ -3,14 +3,22 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:modal_gif_picker/modal_gif_picker.dart';
 import 'package:stories_editor/src/domain/models/editable_items.dart';
+import 'package:stories_editor/src/domain/models/sticker_item.dart';
+import 'package:stories_editor/src/domain/models/sticker_item.dart';
+import 'package:stories_editor/src/domain/models/sticker_item.dart';
+import 'package:stories_editor/src/domain/models/sticker_item.dart';
+import 'package:stories_editor/src/domain/models/sticker_item.dart';
+import 'package:stories_editor/src/domain/models/sticker_item.dart';
+import 'package:stories_editor/src/domain/models/sticker_item.dart';
+import 'package:stories_editor/src/domain/models/sticker_item.dart';
 
 class DraggableWidgetNotifier extends ChangeNotifier {
-  List<EditableItem> _draggableWidget = [];
+  List<StickerItem> _draggableWidget = [];
 
-  List<EditableItem> get draggableWidget => _draggableWidget;
-  void Function(EditableItem)? onAddDraggable;
+  List<StickerItem> get draggableWidget => _draggableWidget;
+  void Function(StickerItem)? onAddDraggable;
 
-  set draggableWidget(List<EditableItem> item) {
+  set draggableWidget(List<StickerItem> item) {
     _draggableWidget = item;
     notifyListeners();
   }
@@ -24,7 +32,7 @@ class DraggableWidgetNotifier extends ChangeNotifier {
   //   notifyListeners();
   // }
 
-  void insert(EditableItem item, {int index = 0, bool silent = false}) {
+  void insert(StickerItem item, {int index = 0, bool silent = false}) {
     if (_draggableWidget.where((d) => d.id == item.id).isNotEmpty) {
       return;
     }
@@ -48,10 +56,10 @@ class DraggableWidgetNotifier extends ChangeNotifier {
     _draggableWidget = [];
   }
 
-  Set<EditableItem> getDistinctDraggableWidget() {
-    var newDraggableWidget = <EditableItem>{};
+  Set<StickerItem> getDistinctDraggableWidget() {
+    var newDraggableWidget = <StickerItem>{};
     if (draggableWidget.isNotEmpty) {
-      newDraggableWidget = SplayTreeSet<EditableItem>.from(draggableWidget);
+      newDraggableWidget = SplayTreeSet<StickerItem>.from(draggableWidget);
     }
     return newDraggableWidget;
   }

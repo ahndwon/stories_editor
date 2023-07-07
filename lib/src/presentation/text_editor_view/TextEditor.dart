@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:stories_editor/src/domain/models/editable_items.dart';
+import 'package:stories_editor/src/domain/models/sticker_item.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/control_provider.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/draggable_widget_notifier.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/text_editing_notifier.dart';
@@ -9,9 +9,9 @@ import 'package:stories_editor/src/presentation/text_editor_view/widgets/animati
 import 'package:stories_editor/src/presentation/text_editor_view/widgets/font_selector.dart';
 import 'package:stories_editor/src/presentation/text_editor_view/widgets/text_field_widget.dart';
 import 'package:stories_editor/src/presentation/text_editor_view/widgets/top_text_tools.dart';
-import 'package:stories_editor/src/presentation/utils/constants/app_enums.dart';
 import 'package:stories_editor/src/presentation/widgets/color_selector.dart';
 import 'package:stories_editor/src/presentation/widgets/size_slider_selector.dart';
+import 'package:uuid/uuid.dart';
 
 class TextEditor extends StatefulWidget {
   const TextEditor({super.key, required this.context});
@@ -163,16 +163,21 @@ class _TextEditorState extends State<TextEditor> {
       /// create Text Item
       editableItemNotifier.insert(
         index: editableItemNotifier.draggableWidget.length,
-        EditableItem()
-          ..type = ItemType.text
-          ..text = editorNotifier.text.trim()
+        TextSticker(
+          id: const Uuid().v4(),
+          text: editorNotifier.text.trim(),
+          fontSize: editorNotifier.textSize,
+          textList: editorNotifier.textList,
+        )
+          // ..type = ItemType.text
+          // ..text = editorNotifier.text.trim()
           ..backGroundColor = editorNotifier.backGroundColor
           ..textColor = controlNotifier.colorList![editorNotifier.textColor]
           ..fontFamily = editorNotifier.fontFamilyIndex
-          ..fontSize = editorNotifier.textSize
+          // ..fontSize = editorNotifier.textSize
           ..fontAnimationIndex = editorNotifier.fontAnimationIndex
           ..textAlign = editorNotifier.textAlign
-          ..textList = editorNotifier.textList
+          // ..textList = editorNotifier.textList
           ..animationType =
               editorNotifier.animationList[editorNotifier.fontAnimationIndex]
           ..position = Offset.zero,
