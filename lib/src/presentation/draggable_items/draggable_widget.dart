@@ -197,6 +197,14 @@ class DraggableWidget extends StatelessWidget {
         break;
     }
 
+    if (item.type != StickerItemType.text) {
+      contentWidget = SizedBox(
+        width: item.size.width * item.scale,
+        height: item.size.height * item.scale,
+        child: contentWidget,
+      );
+    }
+
     /// set widget data position on main screen
     return OverflowBox(
       child: AnimatedAlignPositioned(

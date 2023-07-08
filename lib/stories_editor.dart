@@ -13,7 +13,7 @@ import 'package:stories_editor/src/domain/providers/notifiers/scroll_notifier.da
 import 'package:stories_editor/src/domain/providers/notifiers/text_editing_notifier.dart';
 import 'package:stories_editor/src/presentation/main_view/main_view.dart';
 
-export 'package:stories_editor/src/domain/models/editable_items.dart';
+export 'package:stories_editor/src/domain/models/editing_user.dart';
 export 'package:stories_editor/src/domain/models/painting_model.dart';
 export 'package:stories_editor/src/domain/models/sticker_item.dart';
 export 'package:stories_editor/src/domain/providers/notifiers/control_provider.dart';
