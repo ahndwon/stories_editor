@@ -10,8 +10,8 @@ class StickerItemConverter
     final jsonType = json['type'];
     if (jsonType == StickerItemType.image.name) {
       return ImageSticker.fromJson(json);
-    } else if (jsonType == StickerItemType.frame.name) {
-      return FrameSticker.fromJson(json);
+    } else if (jsonType == StickerItemType.cut.name) {
+      return CutSticker.fromJson(json);
     } else if (jsonType == StickerItemType.giphy.name) {
       return GiphySticker.fromJson(json);
     } else if (jsonType == StickerItemType.text.name) {
@@ -25,7 +25,7 @@ class StickerItemConverter
   Map<String, dynamic> toJson(StickerItem value) {
     if (value is ImageSticker) {
       return value.toJson();
-    } else if (value is FrameSticker) {
+    } else if (value is CutSticker) {
       return value.toJson();
     } else if (value is GiphySticker) {
       return value.toJson();

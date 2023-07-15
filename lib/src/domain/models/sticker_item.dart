@@ -44,19 +44,22 @@ sealed class StickerItem implements Comparable<StickerItem> {
 }
 
 @JsonSerializable(explicitToJson: true)
-class FrameSticker extends StickerItem {
-  FrameSticker({
+class CutSticker extends StickerItem {
+  CutSticker({
     required super.id,
-    super.type = StickerItemType.frame,
+    required this.url,
+    super.type = StickerItemType.cut,
     super.scale = 1.0,
     super.size = const Size(200, 200),
   });
 
-  @override
-  Map<String, dynamic> toJson() => _$FrameStickerToJson(this);
+  String url;
 
-  static FrameSticker fromJson(Map<String, dynamic> json) =>
-      _$FrameStickerFromJson(json);
+  @override
+  Map<String, dynamic> toJson() => _$CutStickerToJson(this);
+
+  static CutSticker fromJson(Map<String, dynamic> json) =>
+      _$CutStickerFromJson(json);
 }
 
 @JsonSerializable(explicitToJson: true)
@@ -131,7 +134,7 @@ class TextSticker extends StickerItem {
 }
 
 enum StickerItemType {
-  frame,
+  cut,
   image,
   giphy,
   text;

@@ -169,6 +169,22 @@ class MainToolsState extends State<MainTools> {
                   size: 20,
                 ),
               ),
+              ToolButton(
+                backGroundColor: Colors.black12,
+                onTap: () async {
+                  itemNotifier.insert(
+                    CutSticker(
+                      id: const Uuid().v4(),
+                      url: '',
+                    ),
+                  );
+                },
+                child: const Icon(
+                  Icons.add,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
             ],
           ),
           // child: Row(
@@ -299,13 +315,6 @@ class MainToolsState extends State<MainTools> {
     ControlNotifier controlNotifier,
   ) {
     return GalleryMediaPicker(
-      gridViewController: ScrollController(),
-      thumbnailQuality: 300,
-      onlyImages: true,
-      appBarColor: Colors.black,
-      gridViewPhysics: itemProvider.draggableWidget.isEmpty
-          ? const NeverScrollableScrollPhysics()
-          : const ScrollPhysics(),
       pathList: (path) {
         controlNotifier.mediaPath = path.first.path!;
         if (controlNotifier.mediaPath.isNotEmpty) {
@@ -318,28 +327,37 @@ class MainToolsState extends State<MainTools> {
         }
         Navigator.of(context).pop();
       },
-      appBarLeadingWidget: Padding(
-        padding: const EdgeInsets.only(bottom: 15, right: 15),
-        child: Align(
-          alignment: Alignment.bottomRight,
-          child: AnimatedOnTapButton(
-            onTap: () {},
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: Colors.white,
-                  width: 1.2,
+      mediaPickerParams: MediaPickerParamsModel(
+        gridViewController: ScrollController(),
+        thumbnailQuality: 300,
+        onlyImages: true,
+        appBarColor: Colors.black,
+        gridViewPhysics: itemProvider.draggableWidget.isEmpty
+            ? const NeverScrollableScrollPhysics()
+            : const ScrollPhysics(),
+        appBarLeadingWidget: Padding(
+          padding: const EdgeInsets.only(bottom: 15, right: 15),
+          child: Align(
+            alignment: Alignment.bottomRight,
+            child: AnimatedOnTapButton(
+              onTap: () {},
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: Colors.white,
+                    width: 1.2,
+                  ),
                 ),
-              ),
-              child: const Text(
-                'Cancel',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w400,
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
               ),
             ),

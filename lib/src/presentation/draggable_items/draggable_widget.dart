@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:align_positioned/align_positioned.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:stories_editor/src/domain/models/sticker_item.dart';
@@ -14,11 +15,12 @@ import 'package:stories_editor/src/domain/providers/notifiers/text_editing_notif
 import 'package:stories_editor/src/presentation/utils/constants/app_enums.dart';
 import 'package:stories_editor/src/presentation/utils/screen_util_helper.dart';
 import 'package:stories_editor/src/presentation/widgets/animated_onTap_button.dart';
+import 'package:stories_editor/src/presentation/widgets/cut_image.dart';
+import 'package:stories_editor/src/presentation/widgets/unnotifiable_transformation_controller.dart';
 
-class DraggableWidget extends StatelessWidget {
+class DraggableWidget extends StatefulWidget {
   const DraggableWidget({
     super.key,
-    required this.context,
     required this.item,
     this.onPointerDown,
     this.onPointerUp,
@@ -39,20 +41,25 @@ class DraggableWidget extends StatelessWidget {
   final void Function(PointerDownEvent)? onScaleStart;
   final void Function(PointerMoveEvent)? onScaleMove;
   final void Function(StickerItem)? onFlipTap;
-  final BuildContext context;
   final bool isSelected;
   final Widget? frame;
 
   @override
+  State<DraggableWidget> createState() => _DraggableWidgetState();
+}
+
+class _DraggableWidgetState extends State<DraggableWidget> {
+  bool isImageEditMode = false;
+
+  @override
   Widget build(BuildContext context) {
     final screenUtil = ScreenUtil();
-    final colorProvider =
-        Provider.of<GradientNotifier>(this.context, listen: false);
+    final colorProvider = Provider.of<GradientNotifier>(context, listen: false);
     final controlProvider =
-        Provider.of<ControlNotifier>(this.context, listen: false);
+        Provider.of<ControlNotifier>(context, listen: false);
     Widget? contentWidget;
     BoxDecoration? decoration;
-    if (isSelected) {
+    if (widget.isSelected) {
       decoration = BoxDecoration(
         border: Border.all(
           width: 2,
@@ -62,64 +69,19 @@ class DraggableWidget extends StatelessWidget {
       );
     }
 
-    switch (item.type) {
+    switch (widget.item.type) {
       case StickerItemType.text:
-        contentWidget = IntrinsicWidth(
-          child: IntrinsicHeight(
-            child: Container(
-              constraints: BoxConstraints(
-                minHeight: 50,
-                minWidth: 50,
-                maxWidth: screenUtil.screenWidth - 240.w,
-              ),
-              decoration: decoration,
-              width: item.deletePosition ? 100 : null,
-              height: item.deletePosition ? 100 : null,
-              child: AnimatedOnTapButton(
-                onTap: () => _onTap(context, item, controlProvider),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Center(
-                      child: _text(
-                        background: true,
-                        paintingStyle: PaintingStyle.fill,
-                        controlNotifier: controlProvider,
-                      ),
-                    ),
-                    IgnorePointer(
-                      child: Center(
-                        child: _text(
-                          background: true,
-                          paintingStyle: PaintingStyle.stroke,
-                          controlNotifier: controlProvider,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 2.5, top: 2),
-                      child: Stack(
-                        children: [
-                          Center(
-                            child: _text(
-                              paintingStyle: PaintingStyle.fill,
-                              controlNotifier: controlProvider,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ),
+        contentWidget = buildText(
+          screenUtil,
+          decoration,
+          context,
+          controlProvider,
         );
         break;
 
       /// image [file_image_gb.dart]
       case StickerItemType.image:
-        final imageSticker = item as ImageSticker;
+        final imageSticker = widget.item as ImageSticker;
         final imageUrl = imageSticker.url;
         final imageWidth = screenUtil.screenWidth - 200.w;
 
@@ -160,81 +122,171 @@ class DraggableWidget extends StatelessWidget {
         break;
 
       case StickerItemType.giphy:
-        final giphy = item as GiphySticker;
-        contentWidget = SizedBox(
-          width: 150,
-          height: 150,
-          child: Container(
-            alignment: Alignment.center,
-            padding: const EdgeInsets.all(8),
-            decoration: isSelected ? decoration : const BoxDecoration(),
-            child: Image.network(
-              key: ValueKey(giphy.id),
-              giphy.url,
-              loadingBuilder: (
-                context,
-                child,
-                loadingProgress,
-              ) {
-                if (loadingProgress?.cumulativeBytesLoaded !=
-                    loadingProgress?.cumulativeBytesLoaded) {
-                  return const CircularProgressIndicator();
-                }
-                return child;
-              },
-            ),
-            // child: GiphyRenderImage(
-            //   key: ValueKey(item.gif.id),
-            //   url: item.gif.stillUrl,
-            //   renderGiphyOverlay: false,
-            // ),
-          ),
-        );
+        final giphy = widget.item as GiphySticker;
+        contentWidget = buildGiphy(decoration, giphy);
         break;
 
-      case StickerItemType.frame:
-        contentWidget = const Center();
+      case StickerItemType.cut:
+        final cut = widget.item as CutSticker;
+        contentWidget = CutImage(
+          controller: UnNotifiableTransformationController(),
+          width: cut.size.width * cut.scale,
+          imageUrl: cut.url,
+        );
         break;
     }
 
-    if (item.type != StickerItemType.text) {
+    if (widget.item.type != StickerItemType.text ||
+        widget.item.type != StickerItemType.cut) {
       contentWidget = SizedBox(
-        width: item.size.width * item.scale,
-        height: item.size.height * item.scale,
+        width: widget.item.size.width * widget.item.scale,
+        height: widget.item.size.height * widget.item.scale,
         child: contentWidget,
       );
     }
 
-    /// set widget data position on main screen
+    // if (item.type != StickerItemType.cut) {
+    if (!isImageEditMode) {
+      contentWidget = Listener(
+        onPointerDown: widget.onPointerDown,
+        onPointerUp: widget.onPointerUp,
+        onPointerMove: widget.onPointerMove,
+        // behavior: HitTestBehavior.opaque,
+        /// show widget
+        child: contentWidget,
+      );
+    }
+
+    contentWidget = GestureDetector(
+      onDoubleTap: () {
+        debugPrint('content onDoubleTap');
+        HapticFeedback.lightImpact();
+        setState(() {
+          isImageEditMode = !isImageEditMode;
+        });
+      },
+      child: contentWidget,
+    );
+
+    contentWidget = buildEditFrame(
+      isShow: widget.isSelected,
+      child: buildEditingUserFrame(
+        child: Transform(
+          alignment: Alignment.center,
+          transform: widget.item.isFlip
+              ? Matrix4.rotationY(math.pi)
+              : Matrix4.identity(),
+          child: contentWidget,
+        ),
+      ),
+    );
+
     return OverflowBox(
       child: AnimatedAlignPositioned(
         duration: const Duration(milliseconds: 100),
-        dy: item.deletePosition
+        dy: widget.item.deletePosition
             ? _deleteTopOffset()
-            : screenUtil.denormalizeByScreenWidth(item.position.dy),
-        dx: item.deletePosition
+            : screenUtil.denormalizeByScreenWidth(widget.item.position.dy),
+        dx: widget.item.deletePosition
             ? 0
-            : screenUtil.denormalizeByScreenWidth(item.position.dx),
+            : screenUtil.denormalizeByScreenWidth(widget.item.position.dx),
         alignment: Alignment.center,
         child: Transform.rotate(
-          angle: item.rotation,
-          child: Listener(
-            onPointerDown: onPointerDown,
-            onPointerUp: onPointerUp,
-            onPointerMove: onPointerMove,
+          angle: widget.item.rotation,
+          child: IgnorePointer(
+            ignoring: isImageEditMode,
+            child: contentWidget,
+          ),
+          // child: contentWidget,
+        ),
+      ),
+    );
+  }
 
-            /// show widget
-            child: buildEditFrame(
-              isShow: isSelected,
-              child: buildEditingUserFrame(
-                child: Transform(
-                  alignment: Alignment.center,
-                  transform: item.isFlip
-                      ? Matrix4.rotationY(math.pi)
-                      : Matrix4.identity(),
-                  child: contentWidget,
+  SizedBox buildGiphy(BoxDecoration? decoration, GiphySticker giphy) {
+    return SizedBox(
+      width: 150,
+      height: 150,
+      child: Container(
+        alignment: Alignment.center,
+        padding: const EdgeInsets.all(8),
+        decoration: widget.isSelected ? decoration : const BoxDecoration(),
+        child: Image.network(
+          key: ValueKey(giphy.id),
+          giphy.url,
+          loadingBuilder: (
+            context,
+            child,
+            loadingProgress,
+          ) {
+            if (loadingProgress?.cumulativeBytesLoaded !=
+                loadingProgress?.cumulativeBytesLoaded) {
+              return const CircularProgressIndicator();
+            }
+            return child;
+          },
+        ),
+        // child: GiphyRenderImage(
+        //   key: ValueKey(item.gif.id),
+        //   url: item.gif.stillUrl,
+        //   renderGiphyOverlay: false,
+        // ),
+      ),
+    );
+  }
+
+  IntrinsicWidth buildText(
+    ScreenUtil screenUtil,
+    BoxDecoration? decoration,
+    BuildContext context,
+    ControlNotifier controlProvider,
+  ) {
+    return IntrinsicWidth(
+      child: IntrinsicHeight(
+        child: Container(
+          constraints: BoxConstraints(
+            minHeight: 50,
+            minWidth: 50,
+            maxWidth: screenUtil.screenWidth - 240.w,
+          ),
+          decoration: decoration,
+          width: widget.item.deletePosition ? 100 : null,
+          height: widget.item.deletePosition ? 100 : null,
+          child: AnimatedOnTapButton(
+            onTap: () => _onTextTap(context, widget.item, controlProvider),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Center(
+                  child: _text(
+                    background: true,
+                    paintingStyle: PaintingStyle.fill,
+                    controlNotifier: controlProvider,
+                  ),
                 ),
-              ),
+                IgnorePointer(
+                  child: Center(
+                    child: _text(
+                      background: true,
+                      paintingStyle: PaintingStyle.stroke,
+                      controlNotifier: controlProvider,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 2.5, top: 2),
+                  child: Stack(
+                    children: [
+                      Center(
+                        child: _text(
+                          paintingStyle: PaintingStyle.fill,
+                          controlNotifier: controlProvider,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ],
             ),
           ),
         ),
@@ -268,7 +320,7 @@ class DraggableWidget extends StatelessWidget {
             top: 0,
             child: IconButton(
               onPressed: () {
-                onDeleteTap?.call(item);
+                widget.onDeleteTap?.call(widget.item);
               },
               icon: const DecoratedBox(
                 decoration: BoxDecoration(
@@ -290,10 +342,10 @@ class DraggableWidget extends StatelessWidget {
             top: 0,
             child: Listener(
               onPointerDown: (details) {
-                onScaleStart?.call(details);
+                widget.onScaleStart?.call(details);
               },
               onPointerMove: (details) {
-                onScaleMove?.call(details);
+                widget.onScaleMove?.call(details);
               },
               child: const DecoratedBox(
                 decoration: BoxDecoration(
@@ -315,8 +367,8 @@ class DraggableWidget extends StatelessWidget {
             right: 0,
             child: IconButton(
               onPressed: () {
-                item.isFlip = !item.isFlip;
-                onFlipTap?.call(item);
+                widget.item.isFlip = !widget.item.isFlip;
+                widget.onFlipTap?.call(widget.item);
               },
               icon: const DecoratedBox(
                 decoration: BoxDecoration(
@@ -338,13 +390,13 @@ class DraggableWidget extends StatelessWidget {
   Widget buildEditingUserFrame({required Widget child}) {
     final nowMilli = DateTime.now().millisecondsSinceEpoch;
     final startedAtMilli =
-        item.editingUser?.receivedAt?.millisecondsSinceEpoch ?? 0;
+        widget.item.editingUser?.receivedAt?.millisecondsSinceEpoch ?? 0;
     const showUserOffset = 500;
     final isOver = nowMilli - startedAtMilli > showUserOffset;
 
     final showColor = isOver
         ? Colors.transparent
-        : (item.editingUser?.backgroundColor ?? Colors.transparent);
+        : (widget.item.editingUser?.backgroundColor ?? Colors.transparent);
 
     final textColor = isOver ? Colors.transparent : Colors.black;
 
@@ -367,7 +419,7 @@ class DraggableWidget extends StatelessWidget {
             ),
           ),
           child: Text(
-            item.editingUser?.username ?? '',
+            widget.item.editingUser?.username ?? '',
             style: TextStyle(
               color: textColor,
               fontSize: 12,
@@ -394,7 +446,7 @@ class DraggableWidget extends StatelessWidget {
     required PaintingStyle paintingStyle,
     bool background = false,
   }) {
-    final textItem = item as TextSticker;
+    final textItem = widget.item as TextSticker;
     if (textItem.animationType == TextAnimationType.none) {
       return Text(
         textItem.text,
@@ -416,7 +468,7 @@ class DraggableWidget extends StatelessWidget {
         ),
         child: AnimatedTextKit(
           repeatForever: true,
-          onTap: () => _onTap(context, textItem, controlNotifier),
+          onTap: () => _onTextTap(context, textItem, controlNotifier),
           animatedTexts: [
             if (textItem.animationType == TextAnimationType.scale)
               ScaleAnimatedText(
@@ -491,9 +543,9 @@ class DraggableWidget extends StatelessWidget {
   double _deleteTopOffset() {
     var top = 0.0;
     final screenUtil = ScreenUtil();
-    if (item.type == StickerItemType.text) {
+    if (widget.item.type == StickerItemType.text) {
       return top = screenUtil.screenWidth / 1.2;
-    } else if (item.type == StickerItemType.giphy) {
+    } else if (widget.item.type == StickerItemType.giphy) {
       return top = screenUtil.screenWidth / 1.18;
     } else {
       return top;
@@ -502,9 +554,9 @@ class DraggableWidget extends StatelessWidget {
 
   double _deleteScale() {
     var scale = 0.0;
-    if (item.type == StickerItemType.text) {
+    if (widget.item.type == StickerItemType.text) {
       return scale = 0.4;
-    } else if (item.type == StickerItemType.giphy) {
+    } else if (widget.item.type == StickerItemType.giphy) {
       return scale = 0.3;
     } else {
       return scale;
@@ -512,16 +564,18 @@ class DraggableWidget extends StatelessWidget {
   }
 
   /// onTap text
-  void _onTap(
+  void _onTextTap(
     BuildContext context,
     StickerItem item,
     ControlNotifier controlNotifier,
   ) {
     item as TextSticker;
     final editorProvider =
-        Provider.of<TextEditingNotifier>(this.context, listen: false);
+        Provider.of<TextEditingNotifier>(context, listen: false);
     final itemProvider =
-        Provider.of<DraggableWidgetNotifier>(this.context, listen: false);
+        Provider.of<DraggableWidgetNotifier>(context, listen: false);
+    final controlNotifier =
+        Provider.of<ControlNotifier>(context, listen: false);
 
     /// load text attributes
     editorProvider.textController.text = item.text.trim();

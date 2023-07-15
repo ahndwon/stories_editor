@@ -299,9 +299,9 @@ class MainViewState extends State<MainView> {
                                   child: Container(),
                                 ),
 
-                                widget.centerWidgetBuilder
-                                        ?.call(context, screenUtil) ??
-                                    const SizedBox(),
+                                // widget.centerWidgetBuilder
+                                //         ?.call(context, screenUtil) ??
+                                //     const SizedBox(),
 
                                 ///list items
                                 ...itemProvider
@@ -310,7 +310,6 @@ class MainViewState extends State<MainView> {
                                     .map((editableItem) {
                                   final draggable = DraggableWidget(
                                     key: _getOrAddKey(editableItem),
-                                    context: context,
                                     item: editableItem,
                                     isSelected:
                                         editableItem.id == _activeItem?.id,
@@ -554,71 +553,71 @@ class MainViewState extends State<MainView> {
     );
   }
 
-  GalleryMediaPicker buildGalleryMediaPicker(
-    ScrollNotifier scrollProvider,
-    DraggableWidgetNotifier itemProvider,
-    ControlNotifier controlNotifier,
-  ) {
-    return GalleryMediaPicker(
-      gridViewController: scrollProvider.gridController,
-      thumbnailQuality: widget.galleryThumbnailQuality,
-      onlyImages: true,
-      appBarColor: widget.editorBackgroundColor ?? Colors.black,
-      gridViewPhysics: itemProvider.draggableWidget.isEmpty
-          ? const NeverScrollableScrollPhysics()
-          : const ScrollPhysics(),
-      pathList: (path) {
-        controlNotifier.mediaPath = path.first.path!;
-        if (controlNotifier.mediaPath.isNotEmpty) {
-          itemProvider.insert(
-            ImageSticker(
-              id: const Uuid().v4(),
-              url: path.first.path!,
-            ),
-          );
-        }
-        scrollProvider.pageController.animateToPage(
-          0,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeIn,
-        );
-      },
-      appBarLeadingWidget: Padding(
-        padding: const EdgeInsets.only(bottom: 15, right: 15),
-        child: Align(
-          alignment: Alignment.bottomRight,
-          child: AnimatedOnTapButton(
-            onTap: () {
-              scrollProvider.pageController.animateToPage(
-                0,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeIn,
-              );
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: Colors.white,
-                  width: 1.2,
-                ),
-              ),
-              child: const Text(
-                'Cancel',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  // GalleryMediaPicker buildGalleryMediaPicker(
+  //   ScrollNotifier scrollProvider,
+  //   DraggableWidgetNotifier itemProvider,
+  //   ControlNotifier controlNotifier,
+  // ) {
+  //   return GalleryMediaPicker(
+  //     gridViewController: scrollProvider.gridController,
+  //     thumbnailQuality: widget.galleryThumbnailQuality,
+  //     onlyImages: true,
+  //     appBarColor: widget.editorBackgroundColor ?? Colors.black,
+  //     gridViewPhysics: itemProvider.draggableWidget.isEmpty
+  //         ? const NeverScrollableScrollPhysics()
+  //         : const ScrollPhysics(),
+  //     pathList: (path) {
+  //       controlNotifier.mediaPath = path.first.path!;
+  //       if (controlNotifier.mediaPath.isNotEmpty) {
+  //         itemProvider.insert(
+  //           ImageSticker(
+  //             id: const Uuid().v4(),
+  //             url: path.first.path!,
+  //           ),
+  //         );
+  //       }
+  //       scrollProvider.pageController.animateToPage(
+  //         0,
+  //         duration: const Duration(milliseconds: 300),
+  //         curve: Curves.easeIn,
+  //       );
+  //     },
+  //     appBarLeadingWidget: Padding(
+  //       padding: const EdgeInsets.only(bottom: 15, right: 15),
+  //       child: Align(
+  //         alignment: Alignment.bottomRight,
+  //         child: AnimatedOnTapButton(
+  //           onTap: () {
+  //             scrollProvider.pageController.animateToPage(
+  //               0,
+  //               duration: const Duration(milliseconds: 300),
+  //               curve: Curves.easeIn,
+  //             );
+  //           },
+  //           child: Container(
+  //             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+  //             decoration: BoxDecoration(
+  //               color: Colors.transparent,
+  //               borderRadius: BorderRadius.circular(10),
+  //               border: Border.all(
+  //                 color: Colors.white,
+  //                 width: 1.2,
+  //               ),
+  //             ),
+  //             child: const Text(
+  //               'Cancel',
+  //               style: TextStyle(
+  //                 color: Colors.white,
+  //                 fontSize: 15,
+  //                 fontWeight: FontWeight.w400,
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   /// validate pop scope gesture
   Future<bool> _popScope() async {

@@ -26,14 +26,16 @@ class ColorDetection {
   }
 
   _calculatePixel(Offset globalPosition) {
-    RenderBox box = currentKey!.currentContext!.findRenderObject() as RenderBox;
-    Offset localPosition = box.globalToLocal(globalPosition);
+    final RenderBox box =
+        currentKey!.currentContext!.findRenderObject() as RenderBox;
+    final Offset localPosition = box.globalToLocal(globalPosition);
 
-    double px = localPosition.dx;
-    double py = localPosition.dy;
+    final double px = localPosition.dx;
+    final double py = localPosition.dy;
 
-    int pixel32 = photo!.getPixelSafe(px.toInt(), py.toInt());
-    int hex = abgrToArgb(pixel32);
+    final int pixel32 =
+        photo!.getPixelSafe(px.toInt(), py.toInt()).image.bitsPerChannel;
+    final int hex = abgrToArgb(pixel32);
 
     stateController!.add(Color(hex));
     return Color(hex);
@@ -42,7 +44,7 @@ class ColorDetection {
   Future<void> loadSnapshotBytes() async {
     RenderRepaintBoundary? boxPaint =
         paintKey!.currentContext!.findRenderObject() as RenderRepaintBoundary?;
-    ui.Image capture = await boxPaint!.toImage();
+    final ui.Image capture = await boxPaint!.toImage();
     ByteData? imageBytes =
         await capture.toByteData(format: ui.ImageByteFormat.png);
     setImageBytes(imageBytes!);
@@ -50,7 +52,7 @@ class ColorDetection {
   }
 
   void setImageBytes(ByteData imageBytes) {
-    List<int> values = imageBytes.buffer.asUint8List();
+    final values = imageBytes.buffer.asUint8List();
     photo = null;
     photo = img.decodeImage(values);
   }
@@ -58,7 +60,7 @@ class ColorDetection {
 
 // image lib uses uses KML color format, convert #AABBGGRR to regular #AARRGGBB
 int abgrToArgb(int argbColor) {
-  int r = (argbColor >> 16) & 0xFF;
-  int b = argbColor & 0xFF;
+  final int r = (argbColor >> 16) & 0xFF;
+  final int b = argbColor & 0xFF;
   return (argbColor & 0xFF00FF00) | (b << 16) | r;
 }

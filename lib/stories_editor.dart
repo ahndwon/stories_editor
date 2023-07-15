@@ -21,6 +21,9 @@ export 'package:stories_editor/src/domain/providers/notifiers/draggable_widget_n
 export 'package:stories_editor/src/domain/providers/notifiers/painting_notifier.dart';
 export 'package:stories_editor/src/presentation/utils/constants/app_enums.dart';
 export 'package:stories_editor/src/presentation/utils/screen_util_helper.dart';
+export 'package:stories_editor/src/presentation/widgets/cut_image.dart';
+export 'package:stories_editor/src/presentation/widgets/rotate_interactive_viewer.dart';
+export 'package:stories_editor/src/presentation/widgets/unnotifiable_transformation_controller.dart';
 export 'package:stories_editor/stories_editor.dart';
 
 class StoriesEditor extends StatefulWidget {

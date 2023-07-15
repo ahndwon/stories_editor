@@ -40,16 +40,17 @@ Map<String, dynamic> _$StickerItemToJson(StickerItem instance) =>
     };
 
 const _$StickerItemTypeEnumMap = {
-  StickerItemType.frame: 'frame',
+  StickerItemType.cut: 'cut',
   StickerItemType.image: 'image',
   StickerItemType.giphy: 'giphy',
   StickerItemType.text: 'text',
 };
 
-FrameSticker _$FrameStickerFromJson(Map<String, dynamic> json) => FrameSticker(
+CutSticker _$CutStickerFromJson(Map<String, dynamic> json) => CutSticker(
       id: json['id'] as String,
+      url: json['url'] as String,
       type: $enumDecodeNullable(_$StickerItemTypeEnumMap, json['type']) ??
-          StickerItemType.frame,
+          StickerItemType.cut,
       scale: (json['scale'] as num?)?.toDouble() ?? 1.0,
       size: json['size'] == null
           ? const Size(200, 200)
@@ -65,7 +66,7 @@ FrameSticker _$FrameStickerFromJson(Map<String, dynamic> json) => FrameSticker(
           : EditingUser.fromJson(json['editingUser'] as Map<String, dynamic>)
       ..deletePosition = json['deletePosition'] as bool;
 
-Map<String, dynamic> _$FrameStickerToJson(FrameSticker instance) =>
+Map<String, dynamic> _$CutStickerToJson(CutSticker instance) =>
     <String, dynamic>{
       'type': _$StickerItemTypeEnumMap[instance.type]!,
       'id': instance.id,
@@ -76,6 +77,7 @@ Map<String, dynamic> _$FrameStickerToJson(FrameSticker instance) =>
       'isFlip': instance.isFlip,
       'editingUser': instance.editingUser?.toJson(),
       'deletePosition': instance.deletePosition,
+      'url': instance.url,
     };
 
 ImageSticker _$ImageStickerFromJson(Map<String, dynamic> json) => ImageSticker(
