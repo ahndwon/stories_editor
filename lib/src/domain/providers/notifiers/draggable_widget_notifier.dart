@@ -79,19 +79,19 @@ class DraggableWidgetNotifier extends ChangeNotifier {
     return newDraggableWidget;
   }
 
-  int cutStickerIndex(String id) {
+  int? cutStickerIndex(String id) {
     var i = 0;
 
     for (final d in draggableWidget) {
       if (d.type == StickerItemType.cut) {
         if (d.id == id) {
-          break;
+          return i;
         } else {
           i++;
         }
       }
     }
-    return i;
+    return null;
   }
 
   void clear() {

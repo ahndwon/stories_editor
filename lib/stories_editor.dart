@@ -54,6 +54,8 @@ class StoriesEditor extends StatefulWidget {
     this.onMoveEndDraggable,
     this.onRemoveDraggable,
     this.onChatButtonClick,
+    this.onAddCutContent,
+    this.onInteractionEnd,
     this.actions,
     this.title,
     this.onUndo,
