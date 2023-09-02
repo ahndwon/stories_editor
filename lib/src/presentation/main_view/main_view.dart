@@ -10,7 +10,7 @@ import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 import 'package:stories_editor/src/domain/models/painting_model.dart';
 import 'package:stories_editor/src/domain/models/sticker_item.dart';
-import 'package:stories_editor/src/domain/providers/notifiers/control_provider.dart';
+import 'package:stories_editor/src/domain/providers/notifiers/control_notifier.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/draggable_widget_notifier.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/gradient_notifier.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/painting_notifier.dart';
