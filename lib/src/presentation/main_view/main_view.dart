@@ -1,19 +1,14 @@
 // ignore_for_file: must_be_immutable
 
-import 'dart:io';
+import 'dart:io' as io;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gallery_media_picker/gallery_media_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
-import 'package:stories_editor/src/domain/models/painting_model.dart';
-import 'package:stories_editor/src/domain/models/sticker_item.dart';
-import 'package:stories_editor/src/domain/providers/notifiers/control_notifier.dart';
-import 'package:stories_editor/src/domain/providers/notifiers/draggable_widget_notifier.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/gradient_notifier.dart';
-import 'package:stories_editor/src/domain/providers/notifiers/painting_notifier.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/scroll_notifier.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/text_editing_notifier.dart';
 import 'package:stories_editor/src/presentation/bar_tools/main_tools.dart';
@@ -25,8 +20,7 @@ import 'package:stories_editor/src/presentation/painting_view/widgets/sketcher.d
 import 'package:stories_editor/src/presentation/text_editor_view/TextEditor.dart';
 import 'package:stories_editor/src/presentation/utils/Extensions/context_extension.dart';
 import 'package:stories_editor/src/presentation/utils/modal_sheets.dart';
-import 'package:stories_editor/src/presentation/widgets/animated_onTap_button.dart';
-import 'package:uuid/uuid.dart';
+import 'package:stories_editor/stories_editor.dart';
 
 class MainView extends StatefulWidget {
   MainView({
@@ -47,6 +41,8 @@ class MainView extends StatefulWidget {
     this.onMoveEndDraggable,
     this.onRemoveDraggable,
     this.onChatButtonClick,
+    this.onAddCutContent,
+    this.onInteractionEnd,
     this.title,
     this.actions,
     this.onUndo,
@@ -113,6 +109,12 @@ class MainView extends StatefulWidget {
 
   // top tool bar actions
   final List<Widget>? actions;
+
+  // on cut content added
+  final void Function(XFile xFile, String id, Matrix4 matrix4)? onAddCutContent;
+
+  // on cut sticker interaction end
+  final void Function(String id, Matrix4 matrix4)? onInteractionEnd;
 
   @override
   MainViewState createState() => MainViewState();
@@ -346,7 +348,25 @@ class MainViewState extends State<MainView> {
                                       widget.onMoveDraggable
                                           ?.call(editableItem);
                                     },
+                                    onAddCutContent: (
+                                      XFile xFile,
+                                      String id,
+                                      Matrix4 matrix4,
+                                    ) {
+                                      widget.onAddCutContent?.call(
+                                        xFile,
+                                        id,
+                                        matrix4,
+                                      );
+                                    },
+                                    onInteractionEnd: (id, matrix4) {
+                                      widget.onInteractionEnd?.call(
+                                        id,
+                                        matrix4,
+                                      );
+                                    },
                                   );
+
                                   return AnimatedPositioned(
                                     duration:
                                         const Duration(milliseconds: 4000),
@@ -476,6 +496,16 @@ class MainViewState extends State<MainView> {
                 visible: controlNotifier.isPainting,
                 child: const Painting(),
               ),
+              if (isDebugMode)
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Row(
+                    children: [
+                      Text(
+                          'w: ${screenUtil.screenWidth.toInt()}, h: ${screenUtil.screenHeight.toInt()}'),
+                    ],
+                  ),
+                ),
             ],
           ),
         ),
@@ -798,7 +828,7 @@ class MainViewState extends State<MainView> {
   double getStatusBarPadding() {
     var statusBarPadding = 0.0;
     if (context.isLongerThan9to16Ratio) {
-      if (Platform.isIOS) {
+      if (io.Platform.isIOS) {
         statusBarPadding = 66.0;
       } else {
         statusBarPadding = 40.0;

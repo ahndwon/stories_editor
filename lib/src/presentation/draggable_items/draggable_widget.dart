@@ -6,6 +6,7 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:stories_editor/src/domain/models/sticker_item.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/control_notifier.dart';
@@ -16,7 +17,6 @@ import 'package:stories_editor/src/presentation/utils/constants/app_enums.dart';
 import 'package:stories_editor/src/presentation/utils/screen_util_helper.dart';
 import 'package:stories_editor/src/presentation/widgets/animated_onTap_button.dart';
 import 'package:stories_editor/src/presentation/widgets/cut_image.dart';
-import 'package:stories_editor/src/presentation/widgets/unnotifiable_transformation_controller.dart';
 
 class DraggableWidget extends StatefulWidget {
   const DraggableWidget({
@@ -26,11 +26,11 @@ class DraggableWidget extends StatefulWidget {
     this.onPointerUp,
     this.onPointerMove,
     this.onDeleteTap,
-    this.onScaleStart,
-    this.onScaleMove,
     this.onFlipTap,
     this.isSelected = false,
     this.frame,
+    this.onAddCutContent,
+    this.onInteractionEnd,
   });
 
   final StickerItem item;
@@ -38,9 +38,9 @@ class DraggableWidget extends StatefulWidget {
   final void Function(PointerUpEvent)? onPointerUp;
   final void Function(PointerMoveEvent)? onPointerMove;
   final void Function(StickerItem)? onDeleteTap;
-  final void Function(PointerDownEvent)? onScaleStart;
-  final void Function(PointerMoveEvent)? onScaleMove;
   final void Function(StickerItem)? onFlipTap;
+  final void Function(XFile xFile, String id, Matrix4 matrix4)? onAddCutContent;
+  final void Function(String id, Matrix4 matrix4)? onInteractionEnd;
   final bool isSelected;
   final Widget? frame;
 
@@ -128,10 +128,21 @@ class _DraggableWidgetState extends State<DraggableWidget> {
 
       case StickerItemType.cut:
         final cut = widget.item as CutSticker;
+        final draggableNotifier =
+            Provider.of<DraggableWidgetNotifier>(context, listen: false);
         contentWidget = CutImage(
-          controller: UnNotifiableTransformationController(),
+          controller: draggableNotifier.createTransformerController(
+            id: cut.id,
+            matrix4: cut.content.matrix4,
+          ),
           width: cut.size.width * cut.scale,
-          imageUrl: cut.url,
+          imageUrl: cut.content.contentPath,
+          onAddContent: (xFile, matrix4) {
+            widget.onAddCutContent?.call(xFile, cut.id, matrix4);
+          },
+          onInteractionEnd: (matrix4) {
+            widget.onInteractionEnd?.call(cut.id, matrix4);
+          },
         );
         break;
     }
@@ -145,8 +156,8 @@ class _DraggableWidgetState extends State<DraggableWidget> {
       );
     }
 
-    // if (item.type != StickerItemType.cut) {
-    if (!isImageEditMode) {
+    if (widget.item.type != StickerItemType.cut) {
+      // if (!isImageEditMode) {
       contentWidget = Listener(
         onPointerDown: widget.onPointerDown,
         onPointerUp: widget.onPointerUp,
@@ -165,7 +176,10 @@ class _DraggableWidgetState extends State<DraggableWidget> {
           isImageEditMode = !isImageEditMode;
         });
       },
-      child: contentWidget,
+      child: IgnorePointer(
+        ignoring: isImageEditMode,
+        child: contentWidget,
+      ),
     );
 
     contentWidget = buildEditFrame(
@@ -193,10 +207,7 @@ class _DraggableWidgetState extends State<DraggableWidget> {
         alignment: Alignment.center,
         child: Transform.rotate(
           angle: widget.item.rotation,
-          child: IgnorePointer(
-            ignoring: isImageEditMode,
-            child: contentWidget,
-          ),
+          child: contentWidget,
           // child: contentWidget,
         ),
       ),
@@ -295,6 +306,8 @@ class _DraggableWidgetState extends State<DraggableWidget> {
   }
 
   Widget buildEditFrame({required Widget child, required bool isShow}) {
+    final isCut = widget.item.type == StickerItemType.cut;
+    final isVisible = isCut || isShow;
     return Stack(
       children: [
         // DecoratedBox(
@@ -314,7 +327,7 @@ class _DraggableWidgetState extends State<DraggableWidget> {
           child: child,
         ),
         Visibility(
-          visible: isShow,
+          visible: isVisible,
           child: Positioned(
             left: 0,
             top: 0,
@@ -336,32 +349,46 @@ class _DraggableWidgetState extends State<DraggableWidget> {
           ),
         ),
         Visibility(
-          visible: isShow,
-          child: Positioned(
+          visible: isVisible,
+          child: const Positioned(
             right: 0,
             top: 0,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+              ),
+              child: Icon(
+                Icons.rotate_left,
+                size: 32,
+              ),
+            ),
+          ),
+        ),
+        Visibility(
+          visible: isCut,
+          child: Positioned(
+            left: 0,
+            bottom: 0,
             child: Listener(
-              onPointerDown: (details) {
-                widget.onScaleStart?.call(details);
-              },
-              onPointerMove: (details) {
-                widget.onScaleMove?.call(details);
-              },
+              onPointerDown: widget.onPointerDown,
+              onPointerUp: widget.onPointerUp,
+              onPointerMove: widget.onPointerMove,
               child: const DecoratedBox(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white,
                 ),
                 child: Icon(
-                  Icons.rotate_left,
-                  size: 32,
+                  Icons.pan_tool,
+                  size: 40,
                 ),
               ),
             ),
           ),
         ),
         Visibility(
-          visible: isShow,
+          visible: isVisible,
           child: Positioned(
             bottom: 0,
             right: 0,

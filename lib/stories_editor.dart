@@ -3,9 +3,10 @@ library stories_editor;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:stories_editor/src/domain/models/sticker_item.dart';
-import 'package:stories_editor/src/domain/providers/notifiers/control_provider.dart';
+import 'package:stories_editor/src/domain/providers/notifiers/control_notifier.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/draggable_widget_notifier.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/gradient_notifier.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/painting_notifier.dart';
@@ -13,10 +14,11 @@ import 'package:stories_editor/src/domain/providers/notifiers/scroll_notifier.da
 import 'package:stories_editor/src/domain/providers/notifiers/text_editing_notifier.dart';
 import 'package:stories_editor/src/presentation/main_view/main_view.dart';
 
+export 'package:stories_editor/src/domain/models/cut_content_info.dart';
 export 'package:stories_editor/src/domain/models/editing_user.dart';
 export 'package:stories_editor/src/domain/models/painting_model.dart';
 export 'package:stories_editor/src/domain/models/sticker_item.dart';
-export 'package:stories_editor/src/domain/providers/notifiers/control_provider.dart';
+export 'package:stories_editor/src/domain/providers/notifiers/control_notifier.dart';
 export 'package:stories_editor/src/domain/providers/notifiers/draggable_widget_notifier.dart';
 export 'package:stories_editor/src/domain/providers/notifiers/painting_notifier.dart';
 export 'package:stories_editor/src/presentation/utils/constants/app_enums.dart';
@@ -113,6 +115,8 @@ class StoriesEditor extends StatefulWidget {
   final void Function(StickerItem)? onMoveDraggable;
   final void Function(StickerItem)? onMoveEndDraggable;
   final void Function(String)? onRemoveDraggable;
+  final void Function(XFile xFile, String id, Matrix4 matrix4)? onAddCutContent;
+  final void Function(String id, Matrix4 matrix4)? onInteractionEnd;
   final void Function()? onChatButtonClick;
 
   /// center widget
@@ -189,6 +193,8 @@ class StoriesEditorState extends State<StoriesEditor> {
             onBackPress: widget.onBackPress,
             editorBackgroundColor: widget.editorBackgroundColor,
             galleryThumbnailQuality: widget.galleryThumbnailQuality,
+            onAddCutContent: widget.onAddCutContent,
+            onInteractionEnd: widget.onInteractionEnd,
             onMoveDraggable: widget.onMoveDraggable,
             onMoveEndDraggable: widget.onMoveEndDraggable,
             onRemoveDraggable: widget.onRemoveDraggable,

@@ -7,6 +7,7 @@ environment:
   sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
+  animated_text_kit: ^4.2.2
   copy_with_extension: ^5.0.3
   color_converter:
     git: https://github.com/ahndwon/color_converter.git

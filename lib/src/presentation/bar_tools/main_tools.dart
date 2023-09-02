@@ -175,7 +175,7 @@ class MainToolsState extends State<MainTools> {
                   itemNotifier.insert(
                     CutSticker(
                       id: const Uuid().v4(),
-                      url: '',
+                      content: CutContentInfo.empty(),
                     ),
                   );
                 },
