@@ -113,6 +113,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.17.1"
+  color_converter:
+    dependency: transitive
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "8e967ee0148d3df4c9bfda9d3fa0d95fa2ad6678"
+      url: "https://github.com/ahndwon/color_converter.git"
+    source: git
+    version: "0.1.0+1"
   colorfilter_generator:
     dependency: transitive
     description:

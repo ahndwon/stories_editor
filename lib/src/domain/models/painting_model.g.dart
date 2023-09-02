@@ -16,7 +16,7 @@ PaintingModel _$PaintingModelFromJson(Map<String, dynamic> json) =>
       (json['thinning'] as num).toDouble(),
       (json['smoothing'] as num).toDouble(),
       json['isComplete'] as bool,
-      const ColorConverter().fromJson(json['lineColor'] as int),
+      const ColorConverter().fromJson(json['lineColor'] as String),
       (json['streamline'] as num).toDouble(),
       json['simulatePressure'] as bool,
       $enumDecode(_$PaintingTypeEnumMap, json['paintingType']),

@@ -1,10 +1,9 @@
+import 'package:color_converter/color_converter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:perfect_freehand/perfect_freehand.dart';
-import 'package:stories_editor/src/domain/converters/color_converter.dart';
 import 'package:stories_editor/src/domain/converters/point_converter.dart';
-import 'package:stories_editor/src/presentation/utils/constants/app_enums.dart';
 import 'package:stories_editor/stories_editor.dart';
 import 'package:uuid/uuid.dart';
 

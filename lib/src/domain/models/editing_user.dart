@@ -1,7 +1,7 @@
+import 'package:color_converter/color_converter.dart';
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:stories_editor/src/domain/converters/color_converter.dart';
 import 'package:stories_editor/src/domain/converters/datetime_converter.dart';
 
 part 'editing_user.g.dart';

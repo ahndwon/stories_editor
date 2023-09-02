@@ -1,6 +1,7 @@
+import 'package:color_converter/color_converter.dart';
+import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:stories_editor/src/domain/converters/color_converter.dart';
 import 'package:stories_editor/src/domain/converters/offset_converter.dart';
 import 'package:stories_editor/src/domain/converters/size_converter.dart';
 import 'package:stories_editor/src/domain/converters/sticker_item_converter.dart';
@@ -43,17 +44,18 @@ sealed class StickerItem implements Comparable<StickerItem> {
   String toString() => toJson().toString();
 }
 
+@CopyWith()
 @JsonSerializable(explicitToJson: true)
 class CutSticker extends StickerItem {
   CutSticker({
     required super.id,
-    required this.url,
+    this.content = const CutContentInfo.empty(),
     super.type = StickerItemType.cut,
     super.scale = 1.0,
     super.size = const Size(200, 200),
   });
 
-  String url;
+  CutContentInfo content;
 
   @override
   Map<String, dynamic> toJson() => _$CutStickerToJson(this);
@@ -62,6 +64,7 @@ class CutSticker extends StickerItem {
       _$CutStickerFromJson(json);
 }
 
+@CopyWith()
 @JsonSerializable(explicitToJson: true)
 class ImageSticker extends StickerItem {
   ImageSticker({
@@ -81,6 +84,7 @@ class ImageSticker extends StickerItem {
       _$ImageStickerFromJson(json);
 }
 
+@CopyWith()
 @JsonSerializable(explicitToJson: true)
 class GiphySticker extends StickerItem {
   GiphySticker({
@@ -102,6 +106,7 @@ class GiphySticker extends StickerItem {
       _$GiphyStickerFromJson(json);
 }
 
+@CopyWith()
 @JsonSerializable(explicitToJson: true)
 class TextSticker extends StickerItem {
   TextSticker({

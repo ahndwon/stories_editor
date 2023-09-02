@@ -98,7 +98,7 @@ EditingUser _$EditingUserFromJson(Map<String, dynamic> json) => EditingUser(
       id: json['id'] as String,
       username: json['username'] as String,
       backgroundColor:
-          const ColorConverter().fromJson(json['backgroundColor'] as int),
+          const ColorConverter().fromJson(json['backgroundColor'] as String),
       receivedAt: _$JsonConverterFromJson<String, DateTime>(
           json['receivedAt'], const DateTimeConverter().fromJson),
     );
