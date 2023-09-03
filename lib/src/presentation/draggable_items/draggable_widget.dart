@@ -126,12 +126,16 @@ class _DraggableWidgetState extends State<DraggableWidget> {
         final cut = widget.item as CutSticker;
         final draggableNotifier =
             Provider.of<DraggableWidgetNotifier>(context, listen: false);
+        var width = cut.size.width.w * cut.scale;
+        if (cut.deletePosition) {
+          width = 50;
+        }
         contentWidget = CutImage(
           controller: draggableNotifier.createTransformerController(
             id: cut.id,
             matrix4: cut.content.matrix4,
           ),
-          width: cut.size.width.w * cut.scale,
+          width: width,
           imageUrl: cut.content.contentPath,
           onAddContent: (xFile, matrix4) {
             widget.onAddCutContent?.call(xFile, cut.id, matrix4);
@@ -145,9 +149,16 @@ class _DraggableWidgetState extends State<DraggableWidget> {
 
     if (widget.item.type != StickerItemType.text ||
         widget.item.type != StickerItemType.cut) {
+      var width = widget.item.size.width.w * widget.item.scale;
+      var height = widget.item.size.height.w * widget.item.scale;
+      final multiplier = math.max(50 / width, 50 / height);
+      if (widget.item.deletePosition) {
+        width *= multiplier;
+        height *= multiplier;
+      }
       contentWidget = SizedBox(
-        width: widget.item.size.width.w * widget.item.scale,
-        height: widget.item.size.height.w * widget.item.scale,
+        width: width,
+        height: height,
         child: contentWidget,
       );
     }
@@ -581,9 +592,12 @@ class _DraggableWidgetState extends State<DraggableWidget> {
   double _deleteTopOffset() {
     var top = 0.0;
     final screenUtil = ScreenUtil();
-    if (widget.item.type == StickerItemType.text) {
+    final itemType = widget.item.type;
+    if (itemType == StickerItemType.text) {
       return top = screenUtil.screenWidth / 1.2;
-    } else if (widget.item.type == StickerItemType.giphy) {
+    } else if (itemType == StickerItemType.giphy ||
+        itemType == StickerItemType.image ||
+        itemType == StickerItemType.cut) {
       return top = screenUtil.screenWidth / 1.18;
     } else {
       return top;

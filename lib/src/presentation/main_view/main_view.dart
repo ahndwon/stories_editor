@@ -720,16 +720,10 @@ class MainViewState extends State<MainView> {
         _isDeletePosition = true;
         item.deletePosition = true;
       });
-    } else if (item.type == StickerItemType.giphy &&
-        item.position.dy >= 0.62.h &&
-        item.position.dx >= -0.35.w &&
-        item.position.dx <= 0.15) {
-      setState(() {
-        _isDeletePosition = true;
-        item.deletePosition = true;
-      });
-    } else if (item.type == StickerItemType.image &&
-        item.position.dy >= 0.62.h &&
+    } else if ((item.type == StickerItemType.giphy ||
+            item.type == StickerItemType.image ||
+            item.type == StickerItemType.cut) &&
+        item.position.dy >= 0.7.h &&
         item.position.dx >= -0.35.w &&
         item.position.dx <= 0.15) {
       setState(() {
