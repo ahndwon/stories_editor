@@ -578,14 +578,16 @@ class _DraggableWidgetState extends State<DraggableWidget> {
     ).copyWith(
       color: background ? Colors.black : textItem.textColor,
       fontSize: textItem.deletePosition ? 8 : textItem.fontSize,
-      background: Paint()
-        ..strokeWidth = 20.0
-        ..color = textItem.backGroundColor
-        ..style = paintingStyle
-        ..strokeJoin = StrokeJoin.round
-        ..filterQuality = FilterQuality.high
-        ..strokeCap = StrokeCap.round
-        ..maskFilter = const MaskFilter.blur(BlurStyle.solid, 1),
+      backgroundColor: textItem.backGroundColor,
+      // TODO(ahndwon): not working on iOS Impeller
+      // background: Paint()
+      //   ..strokeWidth = 20.0
+      //   ..color = textItem.backGroundColor
+      //   ..style = paintingStyle
+      //   ..strokeJoin = StrokeJoin.round
+      //   ..filterQuality = FilterQuality.high
+      //   ..strokeCap = StrokeCap.round
+      //   ..maskFilter = const MaskFilter.blur(BlurStyle.solid, 1),
     );
   }
 
