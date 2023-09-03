@@ -135,7 +135,7 @@ class _DraggableWidgetState extends State<DraggableWidget> {
             id: cut.id,
             matrix4: cut.content.matrix4,
           ),
-          width: cut.size.width * cut.scale,
+          width: cut.size.width.w * cut.scale,
           imageUrl: cut.content.contentPath,
           onAddContent: (xFile, matrix4) {
             widget.onAddCutContent?.call(xFile, cut.id, matrix4);
@@ -150,8 +150,8 @@ class _DraggableWidgetState extends State<DraggableWidget> {
     if (widget.item.type != StickerItemType.text ||
         widget.item.type != StickerItemType.cut) {
       contentWidget = SizedBox(
-        width: widget.item.size.width * widget.item.scale,
-        height: widget.item.size.height * widget.item.scale,
+        width: widget.item.size.width.w * widget.item.scale,
+        height: widget.item.size.height.w * widget.item.scale,
         child: contentWidget,
       );
     }
