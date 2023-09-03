@@ -28,6 +28,8 @@ export 'package:stories_editor/src/presentation/widgets/rotate_interactive_viewe
 export 'package:stories_editor/src/presentation/widgets/unnotifiable_transformation_controller.dart';
 export 'package:stories_editor/stories_editor.dart';
 
+bool isDebugMode = false;
+
 class StoriesEditor extends StatefulWidget {
   const StoriesEditor({
     super.key,

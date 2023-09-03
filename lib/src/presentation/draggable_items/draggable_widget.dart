@@ -8,15 +8,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:stories_editor/src/domain/models/sticker_item.dart';
-import 'package:stories_editor/src/domain/providers/notifiers/control_notifier.dart';
-import 'package:stories_editor/src/domain/providers/notifiers/draggable_widget_notifier.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/gradient_notifier.dart';
 import 'package:stories_editor/src/domain/providers/notifiers/text_editing_notifier.dart';
-import 'package:stories_editor/src/presentation/utils/constants/app_enums.dart';
-import 'package:stories_editor/src/presentation/utils/screen_util_helper.dart';
+import 'package:stories_editor/src/presentation/utils/Extensions/double_extension.dart';
 import 'package:stories_editor/src/presentation/widgets/animated_onTap_button.dart';
-import 'package:stories_editor/src/presentation/widgets/cut_image.dart';
+import 'package:stories_editor/stories_editor.dart';
 
 class DraggableWidget extends StatefulWidget {
   const DraggableWidget({
@@ -194,6 +190,21 @@ class _DraggableWidgetState extends State<DraggableWidget> {
         ),
       ),
     );
+
+    if (isDebugMode) {
+      contentWidget = Stack(
+        alignment: Alignment.center,
+        children: [
+          contentWidget,
+          Text(
+            's: ${widget.item.size}\np: ${screenUtil.denormalizeByScreenWidth(widget.item.position.dx).toPrecision(2)},${screenUtil.denormalizeByScreenWidth(widget.item.position.dy).toPrecision(2)}\nsc: ${widget.item.scale}',
+            style: const TextStyle(
+              color: Colors.red,
+            ),
+          ),
+        ],
+      );
+    }
 
     return OverflowBox(
       child: AnimatedAlignPositioned(
