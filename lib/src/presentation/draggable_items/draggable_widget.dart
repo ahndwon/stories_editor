@@ -45,7 +45,6 @@ class DraggableWidget extends StatefulWidget {
 }
 
 class _DraggableWidgetState extends State<DraggableWidget> {
-  bool isImageEditMode = false;
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +64,8 @@ class _DraggableWidgetState extends State<DraggableWidget> {
       );
     }
 
-    switch (widget.item.type) {
+    final stickerItem = widget.item;
+    switch (stickerItem.type) {
       case StickerItemType.text:
         contentWidget = buildText(
           screenUtil,
@@ -77,7 +77,7 @@ class _DraggableWidgetState extends State<DraggableWidget> {
 
       /// image [file_image_gb.dart]
       case StickerItemType.image:
-        final imageSticker = widget.item as ImageSticker;
+        final imageSticker = stickerItem as ImageSticker;
         final imageUrl = imageSticker.url;
         final imageWidth = screenUtil.screenWidth - 200.w;
 
@@ -118,12 +118,12 @@ class _DraggableWidgetState extends State<DraggableWidget> {
         break;
 
       case StickerItemType.giphy:
-        final giphy = widget.item as GiphySticker;
+        final giphy = stickerItem as GiphySticker;
         contentWidget = buildGiphy(decoration, giphy);
         break;
 
       case StickerItemType.cut:
-        final cut = widget.item as CutSticker;
+        final cut = stickerItem as CutSticker;
         final draggableNotifier =
             Provider.of<DraggableWidgetNotifier>(context, listen: false);
         var width = cut.size.width.w * cut.scale;
@@ -147,12 +147,12 @@ class _DraggableWidgetState extends State<DraggableWidget> {
         break;
     }
 
-    if (widget.item.type != StickerItemType.text ||
-        widget.item.type != StickerItemType.cut) {
-      var width = widget.item.size.width.w * widget.item.scale;
-      var height = widget.item.size.height.w * widget.item.scale;
+    if (stickerItem.type != StickerItemType.text ||
+        stickerItem.type != StickerItemType.cut) {
+      var width = stickerItem.size.width.w * stickerItem.scale;
+      var height = stickerItem.size.height.w * stickerItem.scale;
       final multiplier = math.max(50 / width, 50 / height);
-      if (widget.item.deletePosition) {
+      if (stickerItem.deletePosition) {
         width *= multiplier;
         height *= multiplier;
       }
@@ -163,7 +163,17 @@ class _DraggableWidgetState extends State<DraggableWidget> {
       );
     }
 
-    if (widget.item.type != StickerItemType.cut) {
+    var isMoveMode = true;
+    if (stickerItem is CutSticker) {
+      isMoveMode = stickerItem.isMoveMode;
+    }
+
+    contentWidget = AbsorbPointer(
+      absorbing: isMoveMode,
+      child: contentWidget,
+    );
+
+    if (stickerItem.type != StickerItemType.cut || isMoveMode) {
       // if (!isImageEditMode) {
       contentWidget = Listener(
         onPointerDown: widget.onPointerDown,
@@ -179,14 +189,12 @@ class _DraggableWidgetState extends State<DraggableWidget> {
       onDoubleTap: () {
         debugPrint('content onDoubleTap');
         HapticFeedback.lightImpact();
-        setState(() {
-          isImageEditMode = !isImageEditMode;
-        });
+        if (stickerItem is CutSticker) {
+          stickerItem.isMoveMode = !stickerItem.isMoveMode;
+        }
+        setState(() {});
       },
-      child: IgnorePointer(
-        ignoring: isImageEditMode,
-        child: contentWidget,
-      ),
+      child: contentWidget,
     );
 
     contentWidget = buildEditFrame(
@@ -194,7 +202,7 @@ class _DraggableWidgetState extends State<DraggableWidget> {
       child: buildEditingUserFrame(
         child: Transform(
           alignment: Alignment.center,
-          transform: widget.item.isFlip
+          transform: stickerItem.isFlip
               ? Matrix4.rotationY(math.pi)
               : Matrix4.identity(),
           child: contentWidget,
@@ -208,7 +216,7 @@ class _DraggableWidgetState extends State<DraggableWidget> {
         children: [
           contentWidget,
           Text(
-            's: ${widget.item.size}\np: ${screenUtil.denormalizeByScreenWidth(widget.item.position.dx).toPrecision(2)},${screenUtil.denormalizeByScreenWidth(widget.item.position.dy).toPrecision(2)}\nsc: ${widget.item.scale}',
+            's: ${stickerItem.size}\np: ${screenUtil.denormalizeByScreenWidth(stickerItem.position.dx).toPrecision(2)},${screenUtil.denormalizeByScreenWidth(stickerItem.position.dy).toPrecision(2)}\nsc: ${stickerItem.scale}',
             style: const TextStyle(
               color: Colors.red,
             ),
@@ -220,15 +228,15 @@ class _DraggableWidgetState extends State<DraggableWidget> {
     return OverflowBox(
       child: AnimatedAlignPositioned(
         duration: const Duration(milliseconds: 100),
-        dy: widget.item.deletePosition
+        dy: stickerItem.deletePosition
             ? _deleteTopOffset()
-            : screenUtil.denormalizeByScreenWidth(widget.item.position.dy),
-        dx: widget.item.deletePosition
+            : screenUtil.denormalizeByScreenWidth(stickerItem.position.dy),
+        dx: stickerItem.deletePosition
             ? 0
-            : screenUtil.denormalizeByScreenWidth(widget.item.position.dx),
+            : screenUtil.denormalizeByScreenWidth(stickerItem.position.dx),
         alignment: Alignment.center,
         child: Transform.rotate(
-          angle: widget.item.rotation,
+          angle: stickerItem.rotation,
           child: contentWidget,
           // child: contentWidget,
         ),

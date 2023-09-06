@@ -56,6 +56,7 @@ class CutSticker extends StickerItem {
   });
 
   CutContentInfo content;
+  bool isMoveMode = false;
 
   @override
   Map<String, dynamic> toJson() => _$CutStickerToJson(this);
