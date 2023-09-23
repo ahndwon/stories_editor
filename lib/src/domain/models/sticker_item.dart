@@ -50,13 +50,14 @@ class CutSticker extends StickerItem {
   CutSticker({
     required super.id,
     this.content = const CutContentInfo.empty(),
+    this.isMoveMode = false,
     super.type = StickerItemType.cut,
     super.scale = 1.0,
     super.size = const Size(200, 200),
   });
 
   CutContentInfo content;
-  bool isMoveMode = false;
+  bool isMoveMode;
 
   @override
   Map<String, dynamic> toJson() => _$CutStickerToJson(this);

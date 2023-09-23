@@ -135,7 +135,7 @@ class _DraggableWidgetState extends State<DraggableWidget> {
             id: cut.id,
             matrix4: cut.content.matrix4,
           ),
-          width: width,
+          width: width.w,
           imageUrl: cut.content.contentPath,
           onAddContent: (xFile, matrix4) {
             widget.onAddCutContent?.call(xFile, cut.id, matrix4);

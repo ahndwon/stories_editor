@@ -11,6 +11,8 @@ abstract class _$CutStickerCWProxy {
 
   CutSticker content(CutContentInfo content);
 
+  CutSticker isMoveMode(bool isMoveMode);
+
   CutSticker type(StickerItemType type);
 
   CutSticker scale(double scale);
@@ -26,6 +28,7 @@ abstract class _$CutStickerCWProxy {
   CutSticker call({
     String? id,
     CutContentInfo? content,
+    bool? isMoveMode,
     StickerItemType? type,
     double? scale,
     Size? size,
@@ -43,6 +46,9 @@ class _$CutStickerCWProxyImpl implements _$CutStickerCWProxy {
 
   @override
   CutSticker content(CutContentInfo content) => this(content: content);
+
+  @override
+  CutSticker isMoveMode(bool isMoveMode) => this(isMoveMode: isMoveMode);
 
   @override
   CutSticker type(StickerItemType type) => this(type: type);
@@ -64,6 +70,7 @@ class _$CutStickerCWProxyImpl implements _$CutStickerCWProxy {
   CutSticker call({
     Object? id = const $CopyWithPlaceholder(),
     Object? content = const $CopyWithPlaceholder(),
+    Object? isMoveMode = const $CopyWithPlaceholder(),
     Object? type = const $CopyWithPlaceholder(),
     Object? scale = const $CopyWithPlaceholder(),
     Object? size = const $CopyWithPlaceholder(),
@@ -77,6 +84,11 @@ class _$CutStickerCWProxyImpl implements _$CutStickerCWProxy {
           ? _value.content
           // ignore: cast_nullable_to_non_nullable
           : content as CutContentInfo,
+      isMoveMode:
+          isMoveMode == const $CopyWithPlaceholder() || isMoveMode == null
+              ? _value.isMoveMode
+              // ignore: cast_nullable_to_non_nullable
+              : isMoveMode as bool,
       type: type == const $CopyWithPlaceholder() || type == null
           ? _value.type
           // ignore: cast_nullable_to_non_nullable
@@ -460,6 +472,7 @@ CutSticker _$CutStickerFromJson(Map<String, dynamic> json) => CutSticker(
       content: json['content'] == null
           ? const CutContentInfo.empty()
           : CutContentInfo.fromJson(json['content'] as Map<String, dynamic>),
+      isMoveMode: json['isMoveMode'] as bool? ?? false,
       type: $enumDecodeNullable(_$StickerItemTypeEnumMap, json['type']) ??
           StickerItemType.cut,
       scale: (json['scale'] as num?)?.toDouble() ?? 1.0,
@@ -489,6 +502,7 @@ Map<String, dynamic> _$CutStickerToJson(CutSticker instance) =>
       'editingUser': instance.editingUser?.toJson(),
       'deletePosition': instance.deletePosition,
       'content': instance.content.toJson(),
+      'isMoveMode': instance.isMoveMode,
     };
 
 ImageSticker _$ImageStickerFromJson(Map<String, dynamic> json) => ImageSticker(
