@@ -62,6 +62,8 @@ class StoriesEditor extends StatefulWidget {
     this.title,
     this.onUndo,
     this.onRedo,
+    this.freeRollMode = false,
+    this.canvasSize = const Size(640, 960),
   });
 
   /// editor custom font families
@@ -122,6 +124,8 @@ class StoriesEditor extends StatefulWidget {
   final void Function(XFile xFile, String id, Matrix4 matrix4)? onAddCutContent;
   final void Function(String id, Matrix4 matrix4)? onInteractionEnd;
   final void Function()? onChatButtonClick;
+  final bool freeRollMode;
+  final Size canvasSize;
 
   /// center widget
   final Widget Function(BuildContext context, ScreenUtil screenUtil)?
@@ -207,6 +211,8 @@ class StoriesEditorState extends State<StoriesEditor> {
             title: widget.title,
             onUndo: widget.onUndo,
             onRedo: widget.onRedo,
+            freeRollMode: widget.freeRollMode,
+            canvasSize: widget.canvasSize,
           ),
         ),
       ),

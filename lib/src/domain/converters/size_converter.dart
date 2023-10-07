@@ -5,10 +5,14 @@ class SizeConverter implements JsonConverter<Size, Map<String, dynamic>> {
   const SizeConverter();
 
   @override
-  Size fromJson(Map<String, dynamic> json) => Size(
-        json['width'] as double? ?? 0,
-        json['height'] as double? ?? 0,
-      );
+  Size fromJson(Map<String, dynamic> json) {
+    final width = json['width'] ?? '0';
+    final height = json['height'] ?? '0';
+    return Size(
+      double.parse(width.toString()),
+      double.parse(height.toString()),
+    );
+  }
 
   @override
   Map<String, dynamic> toJson(Size value) => {
