@@ -832,7 +832,7 @@ class MainViewState extends State<MainView> {
     var statusBarPadding = 0.0;
     if (context.isLongerThan9to16Ratio) {
       if (!kIsWeb && io.Platform.isIOS) {
-        statusBarPadding = 66.0;
+        statusBarPadding = 58.0;
       } else {
         statusBarPadding = 40.0;
       }
