@@ -45,7 +45,6 @@ class DraggableWidget extends StatefulWidget {
 }
 
 class _DraggableWidgetState extends State<DraggableWidget> {
-
   @override
   Widget build(BuildContext context) {
     final screenUtil = ScreenUtil();
@@ -92,12 +91,13 @@ class _DraggableWidgetState extends State<DraggableWidget> {
           } else {
             imageWidget = Image.file(File(imageUrl), width: imageWidth);
           }
+          // ignore: use_decorated_box
           contentWidget = Container(
             decoration: decoration,
             child: imageWidget,
           );
         } else {
-          contentWidget = Container();
+          contentWidget = const SizedBox();
         }
         // if (controlProvider.mediaPath.isNotEmpty) {
         //   contentWidget = SizedBox(
@@ -149,8 +149,8 @@ class _DraggableWidgetState extends State<DraggableWidget> {
 
     if (stickerItem.type != StickerItemType.text ||
         stickerItem.type != StickerItemType.cut) {
-      var width = stickerItem.size.width.w * stickerItem.scale;
-      var height = stickerItem.size.height.w * stickerItem.scale;
+      var width = _computedStickerWidth(stickerItem);
+      var height = _computedStickerHeight(stickerItem);
       final multiplier = math.max(50 / width, 50 / height);
       if (stickerItem.deletePosition) {
         width *= multiplier;
@@ -216,7 +216,14 @@ class _DraggableWidgetState extends State<DraggableWidget> {
         children: [
           contentWidget,
           Text(
-            's: ${stickerItem.size}\np: ${screenUtil.denormalizeByScreenWidth(stickerItem.position.dx).toPrecision(2)},${screenUtil.denormalizeByScreenWidth(stickerItem.position.dy).toPrecision(2)}\nsc: ${stickerItem.scale}',
+            's: ${stickerItem.size}\np: '
+            '${screenUtil.denormalizeByScreenWidth(
+                  stickerItem.position.dx,
+                ).toPrecision(2)}'
+            ',${screenUtil.denormalizeByScreenWidth(
+                  stickerItem.position.dy,
+                ).toPrecision(2)}\n'
+            'sc: ${stickerItem.scale}',
             style: const TextStyle(
               color: Colors.red,
             ),
@@ -244,35 +251,39 @@ class _DraggableWidgetState extends State<DraggableWidget> {
     );
   }
 
-  SizedBox buildGiphy(BoxDecoration? decoration, GiphySticker giphy) {
-    return SizedBox(
-      width: 150,
-      height: 150,
-      child: Container(
-        alignment: Alignment.center,
-        padding: const EdgeInsets.all(8),
-        decoration: widget.isSelected ? decoration : const BoxDecoration(),
-        child: Image.network(
-          key: ValueKey(giphy.id),
-          giphy.url,
-          loadingBuilder: (
-            context,
-            child,
-            loadingProgress,
-          ) {
-            if (loadingProgress?.cumulativeBytesLoaded !=
-                loadingProgress?.cumulativeBytesLoaded) {
-              return const CircularProgressIndicator();
-            }
-            return child;
-          },
-        ),
-        // child: GiphyRenderImage(
-        //   key: ValueKey(item.gif.id),
-        //   url: item.gif.stillUrl,
-        //   renderGiphyOverlay: false,
-        // ),
+  double _computedStickerHeight(StickerItem stickerItem) =>
+      stickerItem.size.height.w * stickerItem.scale;
+
+  double _computedStickerWidth(StickerItem stickerItem) =>
+      stickerItem.size.width.w * stickerItem.scale;
+
+  Widget buildGiphy(BoxDecoration? decoration, GiphySticker giphy) {
+    return Container(
+      alignment: Alignment.center,
+      padding: const EdgeInsets.all(8),
+      decoration: widget.isSelected ? decoration : const BoxDecoration(),
+      child: Image.network(
+        key: ValueKey(giphy.id),
+        width: _computedStickerWidth(giphy),
+        height: _computedStickerHeight(giphy),
+        giphy.url,
+        loadingBuilder: (
+          context,
+          child,
+          loadingProgress,
+        ) {
+          if (loadingProgress?.cumulativeBytesLoaded !=
+              loadingProgress?.cumulativeBytesLoaded) {
+            return const CircularProgressIndicator();
+          }
+          return child;
+        },
       ),
+      // child: GiphyRenderImage(
+      //   key: ValueKey(item.gif.id),
+      //   url: item.gif.stillUrl,
+      //   renderGiphyOverlay: false,
+      // ),
     );
   }
 
