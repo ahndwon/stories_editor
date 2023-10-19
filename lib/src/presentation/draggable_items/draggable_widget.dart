@@ -24,6 +24,7 @@ class DraggableWidget extends StatefulWidget {
     this.onDeleteTap,
     this.onFlipTap,
     this.isSelected = false,
+    this.isPreview = false,
     this.frame,
     this.onAddCutContent,
     this.onInteractionEnd,
@@ -38,6 +39,7 @@ class DraggableWidget extends StatefulWidget {
   final void Function(XFile xFile, String id, Matrix4 matrix4)? onAddCutContent;
   final void Function(String id, Matrix4 matrix4)? onInteractionEnd;
   final bool isSelected;
+  final bool isPreview;
   final Widget? frame;
 
   @override
@@ -48,7 +50,7 @@ class _DraggableWidgetState extends State<DraggableWidget> {
   @override
   Widget build(BuildContext context) {
     final screenUtil = ScreenUtil();
-    final colorProvider = Provider.of<GradientNotifier>(context, listen: false);
+    // final colorProvider = Provider.of<GradientNotifier>(context, listen: false);
     final controlProvider =
         Provider.of<ControlNotifier>(context, listen: false);
     Widget? contentWidget;
@@ -161,6 +163,10 @@ class _DraggableWidgetState extends State<DraggableWidget> {
         height: height,
         child: contentWidget,
       );
+    }
+
+    if (widget.isPreview) {
+      return IgnorePointer(child: contentWidget);
     }
 
     var isMoveMode = true;

@@ -2,6 +2,7 @@
 
 import 'dart:io' as io;
 
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -278,7 +279,7 @@ class MainViewState extends State<MainView> {
                             : LinearGradient(
                                 colors: [
                                   colorProvider.color1,
-                                  colorProvider.color2
+                                  colorProvider.color2,
                                 ],
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
@@ -416,7 +417,7 @@ class MainViewState extends State<MainView> {
                                   height: 20,
                                   color: Colors.white.withOpacity(0.15),
                                 ),
-                              )
+                              ),
                           ],
                         ),
                       ),
@@ -447,7 +448,7 @@ class MainViewState extends State<MainView> {
                         offset: const Offset(1, 1),
                         blurRadius: 3,
                         color: Colors.black45.withOpacity(0.3),
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -467,7 +468,7 @@ class MainViewState extends State<MainView> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                buildHelpTools(),
+                buildHelpTools(itemProvider),
                 if (!context.isLongerThan9to16Ratio)
                   Visibility(
                     visible: !controlNotifier.isTextEditing &&
@@ -500,7 +501,8 @@ class MainViewState extends State<MainView> {
               child: Row(
                 children: [
                   Text(
-                      'w: ${screenUtil.screenWidth.toInt()}, h: ${screenUtil.screenHeight.toInt()}'),
+                    'w: ${screenUtil.screenWidth.toInt()}, h: ${screenUtil.screenHeight.toInt()}',
+                  ),
                 ],
               ),
             ),
@@ -532,7 +534,7 @@ class MainViewState extends State<MainView> {
                 ),
               ),
           ],
-        )
+        ),
         // Container(
         //   height: 50.h,
         //   color: Colors.black,
@@ -795,7 +797,7 @@ class MainViewState extends State<MainView> {
     HapticFeedback.lightImpact();
   }
 
-  Widget buildHelpTools() {
+  Widget buildHelpTools(DraggableWidgetNotifier itemProvider) {
     return Row(
       children: [
         IconButton(
@@ -817,6 +819,76 @@ class MainViewState extends State<MainView> {
           onPressed: widget.onRedo == null ? null : () => widget.onRedo?.call(),
         ),
         const Expanded(child: SizedBox()),
+        IconButton(
+          icon: const Icon(
+            Icons.layers,
+            color: Colors.white,
+            size: 32,
+          ),
+          enableFeedback: true,
+          onPressed: () {
+            final controlNotifier = Provider.of<ControlNotifier>(
+              context,
+              listen: false,
+            );
+            final textEditingNotifier = Provider.of<TextEditingNotifier>(
+              context,
+              listen: false,
+            );
+            showDialog<void>(
+              context: context,
+              builder: (context) {
+                final itemList =
+                    itemProvider.getDistinctDraggableWidget().toList();
+                return MultiProvider(
+                  providers: [
+                    ChangeNotifierProvider.value(
+                      value: controlNotifier,
+                    ),
+                    ChangeNotifierProvider.value(
+                      value: itemProvider,
+                    ),
+                    ChangeNotifierProvider.value(
+                      value: textEditingNotifier,
+                    ),
+                  ],
+                  child: AlertDialog(
+                    // height: 500,
+                    backgroundColor: Colors.white,
+                    content: SizedBox(
+                      width: 300,
+                      height: 500,
+                      child: ReorderableList(
+                        itemBuilder: (context, index) {
+                          final draggable = itemList[index];
+                          final leading = SizedBox(
+                            width: 50,
+                            height: 50,
+                            child: DraggableWidget(
+                              item: draggable,
+                              isPreview: true,
+                            ),
+                          );
+                          return ListTile(
+                            key: ValueKey(draggable),
+                            leading: leading,
+                          );
+                        },
+                        itemCount: itemList.length,
+                        onReorder: (int oldIndex, int newIndex) {
+                          setState(() {
+                            itemProvider.draggableWidget
+                                .swap(oldIndex, newIndex);
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        ),
         IconButton(
           icon: const Icon(
             Icons.chat_bubble,
