@@ -50,6 +50,7 @@ class MainView extends StatefulWidget {
     this.onUndo,
     this.onRedo,
     this.freeRollMode = false,
+    this.previewMode = false,
     required this.canvasSize,
   });
 
@@ -122,6 +123,9 @@ class MainView extends StatefulWidget {
 
   final bool freeRollMode;
 
+  // is for preview
+  final bool previewMode;
+
   final Size canvasSize;
 
   @override
@@ -181,17 +185,19 @@ class MainViewState extends State<MainView> {
       onWillPop: _popScope,
       child: Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          // backgroundColor: Colors.green,
-          actions: widget.actions,
-          title: widget.title,
-          systemOverlayStyle: const SystemUiOverlayStyle(
-            statusBarIconBrightness: Brightness.light,
-            statusBarBrightness: Brightness.dark,
-          ),
-        ),
+        appBar: !widget.previewMode
+            ? AppBar(
+                elevation: 0,
+                backgroundColor: Colors.transparent,
+                // backgroundColor: Colors.green,
+                actions: widget.actions,
+                title: widget.title,
+                systemOverlayStyle: const SystemUiOverlayStyle(
+                  statusBarIconBrightness: Brightness.light,
+                  statusBarBrightness: Brightness.dark,
+                ),
+              )
+            : null,
         body: Material(
           color: widget.editorBackgroundColor == Colors.transparent
               ? Colors.black
@@ -260,7 +266,7 @@ class MainViewState extends State<MainView> {
             child: Align(
               // alignment: Alignment.topCenter,
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(25),
+                borderRadius: BorderRadius.circular(16),
                 child: SizedBox(
                   width: screenUtil.screenWidth,
                   child: RepaintBoundary(
@@ -316,6 +322,7 @@ class MainViewState extends State<MainView> {
                               final draggable = DraggableWidget(
                                 key: _getOrAddKey(editableItem),
                                 item: editableItem,
+                                isPreview: widget.previewMode,
                                 isSelected: editableItem.id == _activeItem?.id,
                                 onDeleteTap: (item) {
                                   setState(() {
@@ -463,24 +470,27 @@ class MainViewState extends State<MainView> {
           ),
 
           /// bottom tools
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                buildHelpTools(itemProvider),
-                if (!context.isLongerThan9to16Ratio)
-                  Visibility(
-                    visible: !controlNotifier.isTextEditing &&
-                        !controlNotifier.isPainting,
-                    child: MainTools(
-                      contentKey: contentKey,
-                      context: context,
+          if (!widget.previewMode)
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  buildHelpTools(itemProvider),
+                  if (!context.isLongerThan9to16Ratio)
+                    Visibility(
+                      visible: !controlNotifier.isTextEditing &&
+                          !controlNotifier.isPainting,
+                      child: MainTools(
+                        contentKey: contentKey,
+                        context: context,
+                      ),
                     ),
-                  ),
-              ],
-            ),
-          ),
+                ],
+              ),
+            )
+          else
+            const SizedBox(),
 
           /// show text editor
           Visibility(
@@ -524,7 +534,7 @@ class MainViewState extends State<MainView> {
           mainAxisSize: MainAxisSize.min,
           children: [
             // buildHelpTools(),
-            if (context.isLongerThan9to16Ratio)
+            if (context.isLongerThan9to16Ratio && !widget.previewMode)
               Visibility(
                 visible: !controlNotifier.isTextEditing &&
                     !controlNotifier.isPainting,
@@ -866,7 +876,7 @@ class MainViewState extends State<MainView> {
                             height: 50,
                             child: DraggableWidget(
                               item: draggable,
-                              isPreview: true,
+                              isPreview: widget.previewMode,
                             ),
                           );
                           return ListTile(

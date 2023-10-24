@@ -63,6 +63,7 @@ class StoriesEditor extends StatefulWidget {
     this.onUndo,
     this.onRedo,
     this.freeRollMode = false,
+    this.previewMode = false,
     this.canvasSize = const Size(640, 960),
   });
 
@@ -125,6 +126,7 @@ class StoriesEditor extends StatefulWidget {
   final void Function(String id, Matrix4 matrix4)? onInteractionEnd;
   final void Function()? onChatButtonClick;
   final bool freeRollMode;
+  final bool previewMode;
   final Size canvasSize;
 
   /// center widget
@@ -212,6 +214,7 @@ class StoriesEditorState extends State<StoriesEditor> {
             onUndo: widget.onUndo,
             onRedo: widget.onRedo,
             freeRollMode: widget.freeRollMode,
+            previewMode: widget.previewMode,
             canvasSize: widget.canvasSize,
           ),
         ),

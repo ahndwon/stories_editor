@@ -166,7 +166,10 @@ class _DraggableWidgetState extends State<DraggableWidget> {
     }
 
     if (widget.isPreview) {
-      return IgnorePointer(child: contentWidget);
+      return wrapPositioned(
+        child: IgnorePointer(child: contentWidget),
+        stickerItem: stickerItem,
+      );
     }
 
     var isMoveMode = true;
@@ -239,20 +242,31 @@ class _DraggableWidgetState extends State<DraggableWidget> {
     }
 
     return OverflowBox(
-      child: AnimatedAlignPositioned(
-        duration: const Duration(milliseconds: 100),
-        dy: stickerItem.deletePosition
-            ? _deleteTopOffset()
-            : screenUtil.denormalizeByScreenWidth(stickerItem.position.dy),
-        dx: stickerItem.deletePosition
-            ? 0
-            : screenUtil.denormalizeByScreenWidth(stickerItem.position.dx),
-        alignment: Alignment.center,
-        child: Transform.rotate(
-          angle: stickerItem.rotation,
-          child: contentWidget,
-          // child: contentWidget,
-        ),
+      child: wrapPositioned(
+        child: contentWidget,
+        stickerItem: stickerItem,
+      ),
+    );
+  }
+
+  Widget wrapPositioned({
+    required Widget child,
+    required StickerItem stickerItem,
+  }) {
+    final screenUtil = ScreenUtil();
+    return AnimatedAlignPositioned(
+      duration: const Duration(milliseconds: 100),
+      dy: stickerItem.deletePosition
+          ? _deleteTopOffset()
+          : screenUtil.denormalizeByScreenWidth(stickerItem.position.dy),
+      dx: stickerItem.deletePosition
+          ? 0
+          : screenUtil.denormalizeByScreenWidth(stickerItem.position.dx),
+      alignment: Alignment.center,
+      child: Transform.rotate(
+        angle: stickerItem.rotation,
+        child: child,
+        // child: contentWidget,
       ),
     );
   }
