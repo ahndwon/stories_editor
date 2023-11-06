@@ -1,5 +1,6 @@
 // ignore_for_file: must_be_immutable
 
+import 'dart:developer';
 import 'dart:io' as io;
 
 import 'package:collection/collection.dart';
@@ -22,6 +23,7 @@ import 'package:stories_editor/src/presentation/painting_view/widgets/sketcher.d
 import 'package:stories_editor/src/presentation/text_editor_view/TextEditor.dart';
 import 'package:stories_editor/src/presentation/utils/Extensions/context_extension.dart';
 import 'package:stories_editor/src/presentation/utils/modal_sheets.dart';
+import 'package:stories_editor/src/presentation/widgets/detect_image_bg.dart';
 import 'package:stories_editor/stories_editor.dart';
 
 class MainView extends StatefulWidget {
@@ -271,162 +273,184 @@ class MainViewState extends State<MainView> {
                   width: screenUtil.screenWidth,
                   child: RepaintBoundary(
                     key: contentKey,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 500),
-                      curve: Curves.easeIn,
-                      decoration: BoxDecoration(
-                        gradient: controlNotifier.mediaPath.isEmpty
-                            ? LinearGradient(
-                                colors: controlNotifier.gradientColors![
-                                    controlNotifier.gradientIndex],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              )
-                            : LinearGradient(
-                                colors: [
-                                  colorProvider.color1,
-                                  colorProvider.color2,
+                    child: DetectImageBg(
+                      key: widget.key,
+                      generatedGradient: (Color color1, Color color2) {
+                        log('generatedGradient : $color1, $color2');
+                        colorProvider
+                          ..color1 = color1
+                          ..color2 = color2;
+                      },
+                      child: Consumer<GradientNotifier>(
+                        builder: (
+                          BuildContext context,
+                          GradientNotifier value,
+                          Widget? child,
+                        ) {
+                          return AnimatedContainer(
+                            duration: const Duration(milliseconds: 500),
+                            curve: Curves.easeIn,
+                            decoration: BoxDecoration(
+                              gradient: colorProvider.color1 == Colors.white
+                                  ? LinearGradient(
+                                      colors: controlNotifier.gradientColors![
+                                          controlNotifier.gradientIndex],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    )
+                                  : LinearGradient(
+                                      colors: [
+                                        value.color1,
+                                        value.color2,
+                                      ],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                    ),
+                            ),
+                            child: GestureDetector(
+                              onScaleStart: _onScaleStart,
+                              onScaleUpdate: _onScaleUpdate,
+                              behavior: HitTestBehavior.deferToChild,
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  /// in this case photo view works
+                                  /// as a main background container
+                                  /// to manage
+                                  /// the gestures of all
+                                  /// movable items.
+                                  PhotoView.customChild(
+                                    backgroundDecoration: const BoxDecoration(
+                                      color: Colors.transparent,
+                                    ),
+                                    child: Container(),
+                                  ),
+
+                                  // widget.centerWidgetBuilder
+                                  //         ?.call(context, screenUtil) ??
+                                  //     const SizedBox(),
+
+                                  ///list items
+                                  ...itemProvider
+                                      .getDistinctDraggableWidget()
+                                      .toList()
+                                      .map((editableItem) {
+                                    final draggable = DraggableWidget(
+                                      key: _getOrAddKey(editableItem),
+                                      item: editableItem,
+                                      isPreview: widget.previewMode,
+                                      isSelected:
+                                          editableItem.id == _activeItem?.id,
+                                      onDeleteTap: (item) {
+                                        setState(() {
+                                          itemProvider.remove(item.id);
+                                          widget.onRemoveDraggable
+                                              ?.call(item.id);
+                                          HapticFeedback.heavyImpact();
+                                        });
+                                      },
+                                      onFlipTap: (item) {
+                                        setState(() {});
+                                        widget.onMoveEndDraggable?.call(item);
+                                      },
+                                      onPointerDown: (details) {
+                                        _updateItemPosition(
+                                          editableItem,
+                                          details,
+                                        );
+                                      },
+                                      onPointerUp: (details) {
+                                        _deleteItemOnCoordinates(
+                                          editableItem,
+                                          details,
+                                        );
+                                        widget.onMoveEndDraggable
+                                            ?.call(editableItem);
+                                      },
+                                      onPointerMove: (details) {
+                                        _deletePosition(
+                                          editableItem,
+                                          details,
+                                        );
+                                        widget.onMoveDraggable
+                                            ?.call(editableItem);
+                                      },
+                                      onAddCutContent: (
+                                        XFile xFile,
+                                        String id,
+                                        Matrix4 matrix4,
+                                      ) {
+                                        widget.onAddCutContent?.call(
+                                          xFile,
+                                          id,
+                                          matrix4,
+                                        );
+                                      },
+                                      onInteractionEnd: (id, matrix4) {
+                                        widget.onInteractionEnd?.call(
+                                          id,
+                                          matrix4,
+                                        );
+                                      },
+                                    );
+
+                                    return AnimatedPositioned(
+                                      duration:
+                                          const Duration(milliseconds: 4000),
+                                      curve: Curves.easeIn,
+                                      child: draggable,
+                                    );
+                                  }),
+
+                                  /// finger paint
+                                  IgnorePointer(
+                                    child: Align(
+                                      alignment: Alignment.topCenter,
+                                      child: buildFingerPaint(
+                                        screenUtil,
+                                        paintingProvider,
+                                      ),
+                                    ),
+                                  ),
+                                  Center(
+                                    child: Container(
+                                      color: Colors.red,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  Center(
+                                    child: Container(
+                                      color: Colors.red,
+                                      height: 1,
+                                    ),
+                                  ),
+                                  // Align(
+                                  //   alignment: Alignment.bottomCenter,
+                                  //   child: Padding(
+                                  //     padding: const EdgeInsets.only(bottom: 100),
+                                  //     child: OutlinedButton(
+                                  //       child: const Text('Change value'),
+                                  //       onPressed: () {
+                                  //         setState(() {
+                                  //           _isInitialValue = !_isInitialValue;
+                                  //         });
+                                  //       },
+                                  //     ),
+                                  //   ),
+                                  // ),
+                                  if (!context.isLongerThan9to16Ratio)
+                                    Align(
+                                      alignment: Alignment.topCenter,
+                                      child: Container(
+                                        height: 20,
+                                        color: Colors.white.withOpacity(0.15),
+                                      ),
+                                    ),
                                 ],
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                              ),
-                      ),
-                      child: GestureDetector(
-                        onScaleStart: _onScaleStart,
-                        onScaleUpdate: _onScaleUpdate,
-                        behavior: HitTestBehavior.deferToChild,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            /// in this case photo view works
-                            /// as a main background container
-                            /// to manage
-                            /// the gestures of all
-                            /// movable items.
-                            PhotoView.customChild(
-                              backgroundDecoration: const BoxDecoration(
-                                color: Colors.transparent,
-                              ),
-                              child: Container(),
-                            ),
-
-                            // widget.centerWidgetBuilder
-                            //         ?.call(context, screenUtil) ??
-                            //     const SizedBox(),
-
-                            ///list items
-                            ...itemProvider
-                                .getDistinctDraggableWidget()
-                                .toList()
-                                .map((editableItem) {
-                              final draggable = DraggableWidget(
-                                key: _getOrAddKey(editableItem),
-                                item: editableItem,
-                                isPreview: widget.previewMode,
-                                isSelected: editableItem.id == _activeItem?.id,
-                                onDeleteTap: (item) {
-                                  setState(() {
-                                    itemProvider.remove(item.id);
-                                    widget.onRemoveDraggable?.call(item.id);
-                                    HapticFeedback.heavyImpact();
-                                  });
-                                },
-                                onFlipTap: (item) {
-                                  setState(() {});
-                                  widget.onMoveEndDraggable?.call(item);
-                                },
-                                onPointerDown: (details) {
-                                  _updateItemPosition(
-                                    editableItem,
-                                    details,
-                                  );
-                                },
-                                onPointerUp: (details) {
-                                  _deleteItemOnCoordinates(
-                                    editableItem,
-                                    details,
-                                  );
-                                  widget.onMoveEndDraggable?.call(editableItem);
-                                },
-                                onPointerMove: (details) {
-                                  _deletePosition(
-                                    editableItem,
-                                    details,
-                                  );
-                                  widget.onMoveDraggable?.call(editableItem);
-                                },
-                                onAddCutContent: (
-                                  XFile xFile,
-                                  String id,
-                                  Matrix4 matrix4,
-                                ) {
-                                  widget.onAddCutContent?.call(
-                                    xFile,
-                                    id,
-                                    matrix4,
-                                  );
-                                },
-                                onInteractionEnd: (id, matrix4) {
-                                  widget.onInteractionEnd?.call(
-                                    id,
-                                    matrix4,
-                                  );
-                                },
-                              );
-
-                              return AnimatedPositioned(
-                                duration: const Duration(milliseconds: 4000),
-                                curve: Curves.easeIn,
-                                child: draggable,
-                              );
-                            }),
-
-                            /// finger paint
-                            IgnorePointer(
-                              child: Align(
-                                alignment: Alignment.topCenter,
-                                child: buildFingerPaint(
-                                  screenUtil,
-                                  paintingProvider,
-                                ),
                               ),
                             ),
-                            Center(
-                              child: Container(
-                                color: Colors.red,
-                                width: 1,
-                              ),
-                            ),
-                            Center(
-                              child: Container(
-                                color: Colors.red,
-                                height: 1,
-                              ),
-                            ),
-                            // Align(
-                            //   alignment: Alignment.bottomCenter,
-                            //   child: Padding(
-                            //     padding: const EdgeInsets.only(bottom: 100),
-                            //     child: OutlinedButton(
-                            //       child: const Text('Change value'),
-                            //       onPressed: () {
-                            //         setState(() {
-                            //           _isInitialValue = !_isInitialValue;
-                            //         });
-                            //       },
-                            //     ),
-                            //   ),
-                            // ),
-                            if (!context.isLongerThan9to16Ratio)
-                              Align(
-                                alignment: Alignment.topCenter,
-                                child: Container(
-                                  height: 20,
-                                  color: Colors.white.withOpacity(0.15),
-                                ),
-                              ),
-                          ],
-                        ),
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -734,7 +758,7 @@ class MainViewState extends State<MainView> {
   /// active delete widget with offset position
   void _deletePosition(StickerItem item, PointerMoveEvent details) {
     if (item.type == StickerItemType.text &&
-        item.position.dy >= 0.75.h &&
+        item.position.dy >= 0.83.h &&
         item.position.dx >= -0.4.w &&
         item.position.dx <= 0.2.w) {
       setState(() {
@@ -744,7 +768,7 @@ class MainViewState extends State<MainView> {
     } else if ((item.type == StickerItemType.giphy ||
             item.type == StickerItemType.image ||
             item.type == StickerItemType.cut) &&
-        item.position.dy >= 0.7.h &&
+        item.position.dy >= 0.85.h &&
         item.position.dx >= -0.35.w &&
         item.position.dx <= 0.15) {
       setState(() {

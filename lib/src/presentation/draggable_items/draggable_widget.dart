@@ -12,6 +12,7 @@ import 'package:stories_editor/src/domain/providers/notifiers/gradient_notifier.
 import 'package:stories_editor/src/domain/providers/notifiers/text_editing_notifier.dart';
 import 'package:stories_editor/src/presentation/utils/Extensions/double_extension.dart';
 import 'package:stories_editor/src/presentation/widgets/animated_onTap_button.dart';
+import 'package:stories_editor/src/presentation/widgets/file_image_bg.dart';
 import 'package:stories_editor/stories_editor.dart';
 
 class DraggableWidget extends StatefulWidget {
@@ -91,7 +92,18 @@ class _DraggableWidgetState extends State<DraggableWidget> {
               width: imageWidth,
             );
           } else {
-            imageWidget = Image.file(File(imageUrl), width: imageWidth);
+            final colorProvider =
+                Provider.of<GradientNotifier>(context, listen: false);
+            final file = File(imageUrl);
+            imageWidget = FileImageBG(
+              filePath: file,
+              generatedGradient: (color1, color2) {
+                colorProvider
+                  ..color1 = color1
+                  ..color2 = color2;
+              },
+            );
+            // imageWidget = Image.file(file, width: imageWidth);
           }
           // ignore: use_decorated_box
           contentWidget = Container(
