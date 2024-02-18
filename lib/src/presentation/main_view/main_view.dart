@@ -25,6 +25,7 @@ import 'package:stories_editor/src/presentation/text_editor_view/TextEditor.dart
 import 'package:stories_editor/src/presentation/utils/constants/app_enums.dart';
 import 'package:stories_editor/src/presentation/utils/modal_sheets.dart';
 import 'package:stories_editor/src/presentation/widgets/animated_onTap_button.dart';
+import 'package:stories_editor/src/presentation/widgets/scrollable_pageView.dart';
 
 class MainView extends StatefulWidget {
   MainView({
@@ -155,35 +156,35 @@ class MainViewState extends State<MainView> {
           ) {
             return SafeArea(
               top: false,
-              child: buildMainView(
-                controlNotifier,
-                screenUtil,
-                colorProvider,
-                itemProvider,
-                context,
-                paintingProvider,
-              ),
-              // child: ScrollablePageView(
-              //   scrollPhysics: controlNotifier.mediaPath.isEmpty &&
-              //       itemProvider.draggableWidget.isEmpty &&
-              //       !controlNotifier.isPainting &&
-              //       !controlNotifier.isTextEditing,
-              //   pageController: scrollProvider.pageController,
-              //   gridController: scrollProvider.gridController,
-              //   mainView: buildMainView(
-              //     controlNotifier,
-              //     screenUtil,
-              //     colorProvider,
-              //     itemProvider,
-              //     context,
-              //     paintingProvider,
-              //   ),
-              //   gallery: buildGalleryMediaPicker(
-              //     scrollProvider,
-              //     itemProvider,
-              //     controlNotifier,
-              //   ),
+              // child: buildMainView(
+              //   controlNotifier,
+              //   screenUtil,
+              //   colorProvider,
+              //   itemProvider,
+              //   context,
+              //   paintingProvider,
               // ),
+              child: ScrollablePageView(
+                scrollPhysics: controlNotifier.mediaPath.isEmpty &&
+                    itemProvider.draggableWidget.isEmpty &&
+                    !controlNotifier.isPainting &&
+                    !controlNotifier.isTextEditing,
+                pageController: scrollProvider.pageController,
+                gridController: scrollProvider.gridController,
+                mainView: buildMainView(
+                  controlNotifier,
+                  screenUtil,
+                  colorProvider,
+                  itemProvider,
+                  context,
+                  paintingProvider,
+                ),
+                gallery: buildGalleryMediaPicker(
+                  scrollProvider,
+                  itemProvider,
+                  controlNotifier,
+                ),
+              ),
             );
           },
         ),
@@ -427,15 +428,8 @@ class MainViewState extends State<MainView> {
     ControlNotifier controlNotifier,
   ) {
     return GalleryMediaPicker(
-      gridViewController: scrollProvider.gridController,
-      thumbnailQuality: widget.galleryThumbnailQuality,
-      onlyImages: true,
-      appBarColor: widget.editorBackgroundColor ?? Colors.black,
-      gridViewPhysics: itemProvider.draggableWidget.isEmpty
-          ? const NeverScrollableScrollPhysics()
-          : const ScrollPhysics(),
       pathList: (path) {
-        controlNotifier.mediaPath = path.first.path!;
+        controlNotifier.mediaPath = path.first.path;
         if (controlNotifier.mediaPath.isNotEmpty) {
           itemProvider.draggableWidget.insert(
             0,
@@ -450,9 +444,20 @@ class MainViewState extends State<MainView> {
           curve: Curves.easeIn,
         );
       },
-      appBarLeadingWidget: Padding(
-        padding: const EdgeInsets.only(bottom: 15, right: 15),
-        child: Align(
+      mediaPickerParams: MediaPickerParamsModel(
+        appBarHeight: 100,
+        maxPickImages: 5,
+        crossAxisCount: 3,
+        childAspectRatio: 1,
+        thumbnailQuality: 200,
+        // singlePick: _singlePick,
+        thumbnailBoxFix: BoxFit.cover,
+        imageBackgroundColor: Colors.black,
+        selectedCheckColor: Colors.black87,
+        selectedBackgroundColor: Colors.black,
+        gridViewBackgroundColor: Colors.grey[900]!,
+        selectedCheckBackgroundColor: Colors.white10,
+        appBarLeadingWidget: Align(
           alignment: Alignment.bottomRight,
           child: AnimatedOnTapButton(
             onTap: () {

@@ -5,24 +5,26 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class ScrollablePageView extends StatefulWidget {
+  ScrollablePageView({
+    super.key,
+    required this.mainView,
+    required this.gallery,
+    required this.scrollPhysics,
+    required this.pageController,
+    required this.gridController,
+  });
+
   Widget mainView;
   Widget gallery;
   final bool scrollPhysics;
   PageController pageController;
   ScrollController gridController;
-  ScrollablePageView(
-      {Key? key,
-      required this.mainView,
-      required this.gallery,
-      required this.scrollPhysics,
-      required this.pageController,
-      required this.gridController})
-      : super(key: key);
+
   @override
-  _ScrollablePageViewState createState() => _ScrollablePageViewState();
+  ScrollablePageViewState createState() => ScrollablePageViewState();
 }
 
-class _ScrollablePageViewState extends State<ScrollablePageView> {
+class ScrollablePageViewState extends State<ScrollablePageView> {
   PageController? _pageController;
   ScrollController? _listScrollController;
   ScrollController? _activeScrollController;
@@ -44,9 +46,8 @@ class _ScrollablePageViewState extends State<ScrollablePageView> {
 
   void _handleDragStart(DragStartDetails details) {
     if (_listScrollController!.hasClients) {
-      final RenderBox renderBox = _listScrollController!
-          .position.context.storageContext
-          .findRenderObject() as RenderBox;
+      final renderBox = _listScrollController!.position.context.storageContext
+          .findRenderObject()! as RenderBox;
       if (renderBox.paintBounds
           .shift(renderBox.localToGlobal(Offset.zero))
           .contains(details.globalPosition)) {
@@ -67,10 +68,12 @@ class _ScrollablePageViewState extends State<ScrollablePageView> {
       _activeScrollController = _pageController;
       _drag?.cancel();
       _drag = _pageController!.position.drag(
-          DragStartDetails(
-              globalPosition: details.globalPosition,
-              localPosition: details.localPosition),
-          _disposeDrag);
+        DragStartDetails(
+          globalPosition: details.globalPosition,
+          localPosition: details.localPosition,
+        ),
+        _disposeDrag,
+      );
     }
     _drag?.update(details);
   }
@@ -91,32 +94,33 @@ class _ScrollablePageViewState extends State<ScrollablePageView> {
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {});
     return RawGestureDetector(
-        gestures: <Type, GestureRecognizerFactory>{
-          VerticalDragGestureRecognizer: GestureRecognizerFactoryWithHandlers<
-                  VerticalDragGestureRecognizer>(
-              () => VerticalDragGestureRecognizer(),
-              (VerticalDragGestureRecognizer instance) {
-            if (widget.scrollPhysics) {
-              instance
-                ..onStart = _handleDragStart
-                ..onUpdate = _handleDragUpdate
-                ..onEnd = _handleDragEnd
-                ..onCancel = _handleDragCancel;
-            } else {
-              instance
-                ..onStart = null
-                ..onUpdate = null
-                ..onEnd = null
-                ..onCancel = null;
-            }
-          })
-        },
-        behavior: HitTestBehavior.opaque,
-        child: PageView(
-          controller: _pageController,
-          scrollDirection: Axis.vertical,
-          physics: const NeverScrollableScrollPhysics(),
-          children: [widget.mainView, widget.gallery],
-        ));
+      gestures: <Type, GestureRecognizerFactory>{
+        VerticalDragGestureRecognizer:
+            GestureRecognizerFactoryWithHandlers<VerticalDragGestureRecognizer>(
+                VerticalDragGestureRecognizer.new,
+                (VerticalDragGestureRecognizer instance) {
+          if (widget.scrollPhysics) {
+            instance
+              ..onStart = _handleDragStart
+              ..onUpdate = _handleDragUpdate
+              ..onEnd = _handleDragEnd
+              ..onCancel = _handleDragCancel;
+          } else {
+            instance
+              ..onStart = null
+              ..onUpdate = null
+              ..onEnd = null
+              ..onCancel = null;
+          }
+        }),
+      },
+      behavior: HitTestBehavior.opaque,
+      child: PageView(
+        controller: _pageController,
+        scrollDirection: Axis.vertical,
+        physics: const NeverScrollableScrollPhysics(),
+        children: [widget.mainView, widget.gallery],
+      ),
+    );
   }
 }
