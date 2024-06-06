@@ -155,7 +155,7 @@ class MainViewState extends State<MainView> {
             child,
           ) {
             return SafeArea(
-              top: false,
+              // top: false,
               // child: buildMainView(
               //   controlNotifier,
               //   screenUtil,

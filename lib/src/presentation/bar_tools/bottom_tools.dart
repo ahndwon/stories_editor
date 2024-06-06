@@ -60,8 +60,11 @@ class BottomTools extends StatelessWidget {
                                       );
                                     }
                                   },
-                                  child: const CoverThumbnail(
+                                  child: CoverThumbnail(
                                     thumbnailQuality: 150,
+                                    paramsModel: MediaPickerParamsModel(
+                                      thumbnailQuality: 150,
+                                    ),
                                   ),
                                 ),
                               )
